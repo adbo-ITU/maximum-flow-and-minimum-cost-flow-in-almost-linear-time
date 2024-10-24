@@ -75,7 +75,25 @@ class MinCostFlow:
         return objective + barrier
 
     def calc_gradients(self, f: np.ndarray) -> np.ndarray:
-        ...
+        gradients = np.zeros(self.m, dtype=float)
+
+        cur_cost = np.dot(self.c, f)
+
+        for e in range(self.m):
+            left = self.u_upper[e] - f[e]
+            right = f[e] - self.u_lower[e]
+
+            # TODO: somehow confirm the validity of defaulting to 0
+            barrier_left = left ** (-1 - self.alpha) if left != 0 else 0
+            barrier_right = right ** (-1 - self.alpha) if right != 0 else 0
+
+            objective = 20 * self.m * \
+                ((cur_cost - self.optimal_cost) ** (-1)) * self.c[e]
+
+            gradients[e] = objective + self.alpha * \
+                barrier_left - self.alpha * barrier_right
+
+        return gradients
 
     def calc_lengths(self, f: np.ndarray) -> np.ndarray:
         lengths = np.zeros(self.m, dtype=float)
