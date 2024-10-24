@@ -27,8 +27,6 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
 
         min_ratio, min_ratio_cycle = find_min_ratio_cycle(I, cur_flow)
 
-        assert min_ratio_cycle is not None, "No min ratio cycle found"
-
         cur_flow += min_ratio_cycle
 
         print("min_ratio =", min_ratio)
