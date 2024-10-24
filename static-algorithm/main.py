@@ -70,8 +70,14 @@ class MinCostFlow:
         return I
 
     def phi(self, f: np.ndarray) -> float:
-        objective = ...
-        barrier = ...
+        cur_cost = np.dot(self.c, f)
+
+        objective = 20 * self.m * np.log2(cur_cost - self.optimal_cost)
+
+        upper_barriers = (self.u_upper - f) ** (-self.alpha)
+        lower_barriers = (f - self.u_lower) ** (-self.alpha)
+        barrier = np.sum(upper_barriers + lower_barriers)
+
         return objective + barrier
 
     def calc_gradients(self, f: np.ndarray) -> np.ndarray:
@@ -106,6 +112,7 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
         l = I.calc_lengths(cur_flow)
         g = I.calc_gradients(cur_flow)
 
+        print("Φ(f) =", I.phi(cur_flow))
         print("l", l)
         print("g", g)
         break
