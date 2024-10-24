@@ -35,6 +35,8 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
         print("flow: ", cur_flow)
         print()
 
+    return cur_flow[-1]
+
 
 if __name__ == "__main__":
     # This is the example max-flow graph at https://www.geeksforgeeks.org/max-flow-problem-introduction/
@@ -53,4 +55,17 @@ if __name__ == "__main__":
     edges = [e[0] for e in graph]
     capacities = [c[1] for c in graph]
 
-    max_flow(edges, capacities, s=0, t=5, optimal_flow=23)
+    low, high = 0, sum(c[1] for c in graph if c[0][0] == 0)
+    while low < high:
+        mid = (low + high) // 2
+        mf = max_flow(edges, capacities, s=0, t=5, optimal_flow=mid)
+
+        if mf == mid:
+            low = mid
+            break
+        elif mf < mid:
+            high = mid
+        else:
+            low = mid + 1
+
+    print("Converged to", low)
