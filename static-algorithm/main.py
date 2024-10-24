@@ -35,6 +35,15 @@ class MinCostFlow:
                      np.max(np.abs(self.u_lower)))
         self.alpha = 1 / np.log2(1000 * self.m * self.U)
 
+        assert len(
+            self.edges) == self.m, f"Number of elements does not match: len(edges) = {len(self.edges)}, m = {self.m}"
+        assert len(
+            self.c) == self.m, f"Number of elements does not match: len(c) = {len(self.c)}, m = {self.m}"
+        assert len(
+            self.u_lower) == self.m, f"Number of elements does not match: len(u_lower) = {len(self.u_lower)}, m = {self.m}"
+        assert len(
+            self.u_upper) == self.m, f"Number of elements does not match: len(u_upper) = {len(self.u_upper)}, m = {self.m}"
+
         self.B = np.zeros((self.m, self.n), dtype=int)
         for e, (a, b) in enumerate(edges):
             self.B[e, a] = 1
@@ -50,8 +59,9 @@ class MinCostFlow:
     def from_max_flow_instance(edges: list[Tuple[int, int]], s: int, t: int, optimal_flow: int, capacities: list[int]):
         new_edges = edges + [(s, t)]
 
-        c = np.array([0] * len(new_edges) + [-1])
-        u_lower = np.zeros(len(new_edges), dtype=int)
+        c = np.zeros(len(new_edges), dtype=float)
+        c[-1] = -1
+        u_lower = np.zeros(len(new_edges), dtype=float)
         u_upper = np.array(capacities + [sum(capacities)])
 
         I = MinCostFlow(edges=new_edges, u_lower=u_lower,
@@ -89,7 +99,7 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
 
     print(I)
 
-    cur_flow = np.zeros(I.m, dtype=int)
+    cur_flow = np.zeros(I.m, dtype=float)
 
     # TODO: change for loop to line 14 of algorithm 7 in the paper
     num_iters = 100
