@@ -88,7 +88,7 @@ class MinCostFlow:
     def calc_lengths(self, f: np.ndarray) -> np.ndarray:
         left = (self.u_upper - f) ** (-1 - self.alpha)
         right = (f - self.u_lower) ** (-1 - self.alpha)
-        return left - right
+        return left + right
 
 
 def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int):
@@ -97,8 +97,8 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
 
     print(I)
 
-    # TODO: find real initial flow. This causes negative lengths...
-    cur_flow = np.zeros(I.m, dtype=float) + 0.0001
+    # TODO: find real initial flow.
+    cur_flow = np.zeros(I.m, dtype=float) + 0.001
 
     # TODO: change for loop to line 14 of algorithm 7 in the paper
     num_iters = 100
