@@ -68,9 +68,19 @@ class MinCostFlow:
         ...
 
     def calc_lengths(self, f: np.ndarray) -> np.ndarray:
-        left = (self.u_upper - f) ** (-1 - self.alpha)
-        right = (f - self.u_lower) ** (-1 - self.alpha)
-        return left - right
+        lengths = np.zeros(self.m, dtype=float)
+
+        for e in range(self.m):
+            left = self.u_upper[e] - f[e]
+            right = f[e] - self.u_lower[e]
+
+            # TODO: somehow confirm the validity of defaulting to 0
+            left = left ** (-1 - self.alpha) if left != 0 else 0
+            right = right ** (-1 - self.alpha) if right != 0 else 0
+
+            lengths[e] = left - right
+
+        return lengths
 
 
 def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int):
