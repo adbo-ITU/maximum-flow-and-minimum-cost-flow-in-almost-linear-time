@@ -17,11 +17,10 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
     cur_flow = (I.u_lower + I.u_upper) / 2
     cur_flow[-1] = optimal_flow / 2
 
-    print(cur_flow)
-
-    # TODO: change for loop to line 14 of algorithm 7 in the paper
-    num_iters = 100
-    for i in range(num_iters):
+    threshold = float(I.m * I.U) ** (-10)
+    i = 0
+    while I.c.dot(cur_flow) - I.optimal_cost >= threshold:
+        i += 1
         print("Iteration", i)
         print("Φ(f) =", I.phi(cur_flow))
 
@@ -35,8 +34,6 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
               for e, c in enumerate(min_ratio_cycle) if c != 0])
         print("flow: ", cur_flow)
         print()
-
-    print("Φ(f) =", cur_flow)
 
 
 if __name__ == "__main__":
