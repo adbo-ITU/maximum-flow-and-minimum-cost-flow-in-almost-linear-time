@@ -1,6 +1,7 @@
 from typing import Tuple
 import numpy as np
 from dataclasses import dataclass
+from cycle import find_all_simple_cycles
 
 
 @dataclass
@@ -134,4 +135,6 @@ if __name__ == "__main__":
     edges = [e[0] for e in graph]
     capacities = [c[1] for c in graph]
 
-    max_flow(edges, capacities, s=0, t=5, optimal_flow=23)
+    find_all_simple_cycles(edges)
+
+    # max_flow(edges, capacities, s=0, t=5, optimal_flow=23)
