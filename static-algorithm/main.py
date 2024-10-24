@@ -19,6 +19,7 @@ class Graph:
             self.B[e, b] = -1
 
     def print_B(self):
+        print(f"{'vertices:': >10} ", ' '.join([f"{i: >2}" for i in range(self.n)]))
         for e, row in enumerate(self.B):
             print(f"{e: <2} {str(self.edges[e]): <7}", row)
 
