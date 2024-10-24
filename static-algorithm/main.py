@@ -12,6 +12,8 @@ class MinCostFlow:
     u_upper: np.ndarray
     u_lower: np.ndarray
     optimal_cost: int
+    U: int
+    alpha: float
     B: np.ndarray
 
     def __init__(
@@ -29,6 +31,9 @@ class MinCostFlow:
         self.u_lower = u_lower
         self.u_upper = u_upper
         self.optimal_cost = optimal_cost
+        self.U = max(np.max(np.abs(self.u_upper)),
+                     np.max(np.abs(self.u_lower)))
+        self.alpha = 1 / np.log2(1000 * self.m * self.U)
 
         self.B = np.zeros((self.m, self.n), dtype=int)
         for e, (a, b) in enumerate(edges):
@@ -63,28 +68,44 @@ class MinCostFlow:
         ...
 
     def calc_lengths(self, f: np.ndarray) -> np.ndarray:
-        ...
+        left = (self.u_upper - f) ** (-1 - self.alpha)
+        right = (f - self.u_lower) ** (-1 - self.alpha)
+        return left - right
 
 
 def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int):
     I = MinCostFlow.from_max_flow_instance(
-        edges, s, t, optimal_flow, capacities)
+        edges=edges, s=s, t=t, optimal_flow=optimal_flow, capacities=capacities)
 
     print(I)
 
+    cur_flow = np.zeros(I.m, dtype=int)
+
+    # TODO: change for loop to line 14 of algorithm 7 in the paper
+    num_iters = 100
+    for _ in range(num_iters):
+        l = I.calc_lengths(cur_flow)
+        g = I.calc_gradients(cur_flow)
+
+        print("l", l)
+        print("g", g)
+        break
+
 
 if __name__ == "__main__":
-    edges = [
-        (1, 2),
-        (1, 4),
-        (3, 1),
-        (4, 2),
-        (6, 3),
-        (6, 4),
-        (2, 5),
-        (5, 6),
+    # This is the example max-flow graph at https://www.geeksforgeeks.org/max-flow-problem-introduction/
+    graph = [
+        ((0, 1), 11),
+        ((0, 2), 12),
+        ((2, 1), 1),
+        ((1, 3), 12),
+        ((2, 4), 11),
+        ((4, 3), 7),
+        ((3, 5), 19),
+        ((4, 5), 4),
     ]
 
-    capacities = [3, 2, 2, 1, 1, 1, 2, 3]
+    edges = [e[0] for e in graph]
+    capacities = [c[1] for c in graph]
 
-    max_flow(edges, capacities, s=1, t=6, optimal_flow=3)
+    max_flow(edges, capacities, s=0, t=5, optimal_flow=23)
