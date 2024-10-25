@@ -1,7 +1,7 @@
 from typing import Tuple
-import numpy as np
 from cycle import find_min_ratio_cycle
 from min_cost_flow_instance import MinCostFlow
+from feasible_flow import calc_feasible_flow
 
 
 def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int):
@@ -13,9 +13,12 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     I.print_B()
     print()
 
-    # TODO: find actual feasible initial flow.
-    cur_flow = (I.u_lower + I.u_upper) / 2
-    cur_flow[-1] = optimal_flow / 2
+    I, cur_flow = calc_feasible_flow(I)
+
+    print(I)
+    print()
+    I.print_B()
+    print()
 
     threshold = float(I.m * I.U) ** (-10)
     i = 0

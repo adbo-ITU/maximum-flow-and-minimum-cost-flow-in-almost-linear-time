@@ -51,7 +51,6 @@ class MinCostFlow:
             self.B[e, a] = 1
             self.B[e, b] = -1
 
-
         self.undirected_edge_to_indices = {}
         for e, (a, b) in enumerate(edges):
             if (a, b) not in self.undirected_edge_to_indices:
@@ -60,7 +59,6 @@ class MinCostFlow:
                 self.undirected_edge_to_indices[(b, a)] = []
             self.undirected_edge_to_indices[(a, b)].append(e)
             self.undirected_edge_to_indices[(b, a)].append(e)
-
 
     def print_B(self):
         print(f"{'vertices:': >10} ", ' '.join(
@@ -111,3 +109,32 @@ class MinCostFlow:
 
     def edges_between(self, a: int, b: int) -> list[int]:
         return self.undirected_edge_to_indices[(a, b)]
+
+    def add_vertex(self):
+        self.n += 1
+        self.B = np.pad(self.B, ((0, 0), (0, 1)),
+                        mode='constant', constant_values=0)
+
+        return self.n-1
+
+    def add_edge(self, a: int, b: int, c: int, u_lower: int, u_upper: int):
+        # FIXME: This might be really slow
+        assert a < self.n
+        assert b < self.n
+
+        self.edges.append((a, b))
+        if (a, b) not in self.undirected_edge_to_indices:
+            self.undirected_edge_to_indices[(a, b)] = []
+        if (b, a) not in self.undirected_edge_to_indices:
+            self.undirected_edge_to_indices[(b, a)] = []
+        self.undirected_edge_to_indices[(a, b)].append(len(self.edges)-1)
+        self.undirected_edge_to_indices[(b, a)].append(len(self.edges)-1)
+
+        self.m += 1
+        self.c = np.append(self.c, c)
+        self.u_lower = np.append(self.u_lower, u_lower)
+        self.u_upper = np.append(self.u_upper, u_upper)
+        self.B = np.pad(self.B, ((0, 1), (0, 0)),
+                        mode='constant', constant_values=0)
+        self.B[-1, a] = 1
+        self.B[-1, b] = -1
