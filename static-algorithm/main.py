@@ -43,19 +43,17 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
                             for e, (u, _) in enumerate(edges) if u == s)
 
     low, high = 0, max_possible_flow
+    mf = None
     while low < high:
         mid = (low + high) // 2
         mf = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=mid)
 
-        if mf == mid:
-            low = mid
-            break
-        elif mf < mid:
+        if mf < mid:
             high = mid
         else:
             low = mid + 1
 
-    return low
+    return mf
 
 
 if __name__ == "__main__":
