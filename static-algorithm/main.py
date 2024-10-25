@@ -4,7 +4,7 @@ from cycle import find_min_ratio_cycle
 from min_cost_flow_instance import MinCostFlow
 
 
-def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int):
+def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int):
     I = MinCostFlow.from_max_flow_instance(
         edges=edges, s=s, t=t, optimal_flow=optimal_flow, capacities=capacities)
 
@@ -38,27 +38,14 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
     return cur_flow[-1]
 
 
-if __name__ == "__main__":
-    # This is the example max-flow graph at https://www.geeksforgeeks.org/max-flow-problem-introduction/
-    # no its not - oops
-    graph = [
-        ((0, 1), 11),
-        ((0, 2), 12),
-        ((2, 1), 1),
-        ((1, 3), 12),
-        ((2, 4), 11),
-        ((4, 3), 7),
-        ((3, 5), 19),
-        ((4, 5), 4),
-    ]
+def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int):
+    max_possible_flow = sum(capacities[e]
+                            for e, (u, _) in enumerate(edges) if u == s)
 
-    edges = [e[0] for e in graph]
-    capacities = [c[1] for c in graph]
-
-    low, high = 0, sum(c[1] for c in graph if c[0][0] == 0)
+    low, high = 0, max_possible_flow
     while low < high:
         mid = (low + high) // 2
-        mf = max_flow(edges, capacities, s=0, t=5, optimal_flow=mid)
+        mf = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=mid)
 
         if mf == mid:
             low = mid
@@ -68,4 +55,25 @@ if __name__ == "__main__":
         else:
             low = mid + 1
 
-    print("Converged to", low)
+    return low
+
+
+if __name__ == "__main__":
+    graph = [
+        ((0, 1), 7),
+        ((0, 2), 4),
+        ((2, 1), 3),
+        ((1, 3), 5),
+        ((1, 4), 3),
+        ((2, 4), 2),
+        ((4, 3), 3),
+        ((3, 5), 8),
+        ((4, 5), 5),
+    ]
+
+    edges = [e[0] for e in graph]
+    capacities = [c[1] for c in graph]
+
+    ans = max_flow(edges, capacities, s=0, t=5)
+
+    print("Found max flow:", ans)
