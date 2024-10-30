@@ -28,6 +28,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("Iteration", i)
         print("Φ(f) =", cur_phi)
 
+        assert np.max(np.abs(I.B.T @ cur_flow)) < 1e-10, "Flow conservation has been broken"
         assert cur_phi < float('inf'), "Φ(f) has exploded"
 
         min_ratio, min_ratio_cycle = find_min_ratio_cycle(I, cur_flow)
