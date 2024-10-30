@@ -2,6 +2,7 @@ from typing import Tuple
 from cycle import find_min_ratio_cycle
 from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
+import numpy as np
 
 
 def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int, lower_capacities: list[int] = None):
@@ -30,6 +31,8 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         i += 1
         print("Iteration", i)
         print("Φ(f) =", I.phi(cur_flow))
+
+        assert np.max(np.abs(I.B.T @ cur_flow)) < 1e-10, "Flow conservation has been broken"
 
         min_ratio, min_ratio_cycle = find_min_ratio_cycle(I, cur_flow)
 
