@@ -89,6 +89,24 @@ def test_flow_sample_from_geeksforgeeks_correct_guess():
     assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23) == 23
 
 
+def test_idk_binary_search():
+    graph = [
+        ((0, 1), 13),
+        ((0, 2), 16),
+        ((1, 2), 4),
+        ((1, 3), 14),
+        ((2, 4), 12),
+        ((4, 1), 9),
+        ((3, 4), 7),
+        ((3, 5), 4),
+        ((4, 5), 20),
+    ]
+
+    edges, capacities, _ = make_edges_and_capacities(graph)
+
+    assert max_flow(edges, capacities, s=0, t=5) == 23
+
+
 def test_idk_correct_guess():
     graph = [
         ((0, 1), 13),
@@ -108,7 +126,7 @@ def test_idk_correct_guess():
     assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23) == 23
 
 
-def test_flow_lower_and_upper():
+def test_flow_lower_and_upper_binary_search():
     graph = [
         ((0, 1), 2, 8),
         ((0, 2), 1, 9),
@@ -125,3 +143,22 @@ def test_flow_lower_and_upper():
 
     assert max_flow(edges, capacities, s=0, t=5,
                     lower_capacities=lower_capacities) == 15
+
+
+def test_flow_lower_and_upper_correct_guess():
+    graph = [
+        ((0, 1), 2, 8),
+        ((0, 2), 1, 9),
+        ((1, 3), 1, 4),
+        ((1, 2), 0, 3),
+        ((2, 3), 2, 5),
+        ((2, 4), 1, 8),
+        ((3, 4), 4, 8),
+        ((3, 5), 0, 7),
+        ((4, 5), 4, 10),
+    ]
+
+    edges, capacities, lower_capacities = make_edges_and_capacities(graph)
+
+    assert max_flow_with_guess(edges, capacities, s=0, t=5,
+                    lower_capacities=lower_capacities, optimal_flow=15) == 15

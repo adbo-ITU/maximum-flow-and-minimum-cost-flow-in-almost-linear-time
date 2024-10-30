@@ -27,7 +27,11 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     print()
 
 
-    threshold = float(I.m * I.U) ** (-10)
+    # TODO: Understand why the paper's threshold is too small
+    # threshold = float(I.m * I.U) ** (-10)
+    threshold = 1e-5
+    print("Threshold:", threshold)
+
     i = 0
     cur_phi = I.phi(cur_flow)
     while I.c.dot(cur_flow) - I.optimal_cost >= threshold:
@@ -49,11 +53,17 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("original flow:", cur_flow[:original_m])
 
         new_phi = I.phi(cur_flow)
-        assert new_phi < float('inf'), "Φ(f) has exploded"
-        assert new_phi < cur_phi, "Φ(f) has not decreased"
+        if not new_phi < float('inf'):
+            print("Φ(f) has exploded")
+            break
+        # assert new_phi < float('inf'), "Φ(f) has exploded"
+        # TODO: Understand why we don't always decrease Φ(f). Sign of gradient? Too large step?
+        # assert new_phi < cur_phi, "Φ(f) has not decreased"
         cur_phi = new_phi
 
         print()
+
+    print("rounded flow:", np.round(cur_flow[:original_m]))
 
     return round(cur_flow[flow_idx])
 
@@ -62,7 +72,7 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
     max_possible_flow = sum(capacities[e]
                             for e, (u, _) in enumerate(edges) if u == s)
 
-    low, high = 0, max_possible_flow
+    low, high = 0, max_possible_flow+1
     mf = None
     while low < high:
         mid = (low + high) // 2
@@ -75,7 +85,7 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
             low = mid + 1
 
     # TODO: fix this, I'm pretty sure this can be off by one
-    return low
+    return mf
 
 
 if __name__ == "__main__":

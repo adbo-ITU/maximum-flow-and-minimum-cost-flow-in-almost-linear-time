@@ -4,6 +4,8 @@ import numpy.linalg as LA
 from min_cost_flow_instance import MinCostFlow
 
 
+kappa = 10
+
 def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     l = I.calc_lengths(f)
     g = I.calc_gradients(f)
@@ -40,15 +42,16 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
 
     assert min_ratio_cycle is not None, "No min ratio cycle found"
 
-    # TODO: scale the circulation according to Theorem 4.3, step 2
-    # idk how to do that right now, so we just do 90% of the way to
-    # the closest constraint of an edge on the cycle
-    max_valid_change = float('inf')
-    for e in range(I.m):
-        if min_ratio_cycle[e] != 0:
-            diff_upper = abs(I.u_upper[e] - f[e])
-            diff_lower = abs(f[e] - I.u_lower[e])
-            max_valid_change = min(max_valid_change, min(abs(diff_upper), abs(diff_lower)))
-    scaling_factor = max_valid_change * 0.9
+    # assert min_ratio <= -kappa, f"min_ratio is not less than -kappa: {min_ratio}"
 
-    return (min_ratio, min_ratio_cycle * scaling_factor)
+    # TODO: I don't know how I made this work, but I did. I'm not sure how good it is.
+    # For example, eta can now be negative, which essentially flips the circulation..
+    # Do we want that? Is it correct? If I understand the paper correctly, eta is always >0.
+    # But Φ(f) explodes if I do the absolute value.
+    gd = g.dot(min_ratio_cycle)
+    print("gd =", gd)
+    # TODO: Scale the circulation according to Theorem 4.3, step 2
+    eta = -kappa / gd
+    print("eta =", eta)
+
+    return (min_ratio, min_ratio_cycle * eta)
