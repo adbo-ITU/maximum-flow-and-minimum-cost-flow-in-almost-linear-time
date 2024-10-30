@@ -27,7 +27,10 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     print()
 
 
-    threshold = float(I.m * I.U) ** (-10)
+    # threshold = float(I.m * I.U) ** (-10)
+    threshold = 1e-5
+    print("Threshold:", threshold)
+
     i = 0
     cur_phi = I.phi(cur_flow)
     while I.c.dot(cur_flow) - I.optimal_cost >= threshold:
