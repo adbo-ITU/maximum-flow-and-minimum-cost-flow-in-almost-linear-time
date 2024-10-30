@@ -4,8 +4,15 @@ import numpy as np
 
 def make_edges_and_capacities(graph):
     edges = [e[0] for e in graph]
-    capacities = [c[1] for c in graph]
-    return edges, capacities
+
+    if len(graph[0]) == 3:
+        capacities = [c[2] for c in graph]
+        lower_capacities = [c[1] for c in graph]
+    else:
+        capacities = [c[1] for c in graph]
+        lower_capacities = None
+
+    return edges, capacities, lower_capacities
 
 
 def test_flow_sample_from_cp_algorithms():
@@ -22,7 +29,7 @@ def test_flow_sample_from_cp_algorithms():
         ((4, 5), 5),
     ]
 
-    edges, capacities = make_edges_and_capacities(graph)
+    edges, capacities, _ = make_edges_and_capacities(graph)
 
     assert max_flow(edges, capacities, s=0, t=5) == 10
 
@@ -40,7 +47,7 @@ def test_flow_sample_from_geeksforgeeks():
         ((4, 5), 4),
     ]
 
-    edges, capacities = make_edges_and_capacities(graph)
+    edges, capacities, _ = make_edges_and_capacities(graph)
 
     assert max_flow(edges, capacities, s=0, t=5) == 23
 
@@ -58,7 +65,7 @@ def test_flow_sample_from_geeksforgeeks_correct_guess():
         ((4, 5), 4),
     ]
 
-    edges, capacities = make_edges_and_capacities(graph)
+    edges, capacities, _ = make_edges_and_capacities(graph)
 
     assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23) == 23
 
@@ -76,7 +83,26 @@ def test_idk():
         ((4, 5), 20),
     ]
 
-    edges, capacities = make_edges_and_capacities(graph)
+    edges, capacities, _ = make_edges_and_capacities(graph)
     # init_flow = np.array([6, 7, 1, 6, 8, 1, 3, 3, 10, 13], dtype=float)
 
     assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23) == 23
+
+
+def test_flow_lower_and_upper():
+    graph = [
+        ((0, 1), 2, 8),
+        ((0, 2), 1, 9),
+        ((1, 3), 1, 4),
+        ((1, 2), 0, 3),
+        ((2, 3), 2, 5),
+        ((2, 4), 1, 8),
+        ((3, 4), 4, 8),
+        ((3, 5), 0, 7),
+        ((4, 5), 4, 10),
+    ]
+
+    edges, capacities, lower_capacities = make_edges_and_capacities(graph)
+
+    assert max_flow(edges, capacities, s=0, t=5,
+                    lower_capacities=lower_capacities) == 15

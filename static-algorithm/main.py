@@ -1,24 +1,30 @@
 from typing import Tuple
-import numpy as np
 from cycle import find_min_ratio_cycle
 from min_cost_flow_instance import MinCostFlow
+from feasible_flow import calc_feasible_flow
+import numpy as np
 
 
-def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int):
+def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int, lower_capacities: list[int] = None):
     I = MinCostFlow.from_max_flow_instance(
-        edges=edges, s=s, t=t, optimal_flow=optimal_flow, capacities=capacities)
+        edges=edges, s=s, t=t, optimal_flow=optimal_flow, capacities=capacities, lower_capacities=lower_capacities)
 
+    print("Initial instance:")
     print(I)
     print()
     I.print_B()
     print()
 
-    # TODO: find actual feasible initial flow.
-    cur_flow = (I.u_lower + I.u_upper) / 2
-    cur_flow[-1] = optimal_flow / 2
+    original_m = I.m
+    I, cur_flow = calc_feasible_flow(I)
 
+    print("Feasible flow instance:")
+    print(I)
+    print("initial_flow:", cur_flow)
+    print()
+    I.print_B()
+    print()
 
-    print(f"init flow: ", cur_flow)
 
     threshold = float(I.m * I.U) ** (-10)
     i = 0
@@ -40,6 +46,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("  -> edges:", [I.edges[e]
               for e, c in enumerate(min_ratio_cycle) if c != 0])
         print("flow: ", cur_flow)
+        print("original flow:", cur_flow[:original_m])
 
         new_phi = I.phi(cur_flow)
         assert new_phi < float('inf'), "Φ(f) has exploded"
@@ -51,7 +58,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     return cur_flow[-1]
 
 
-def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int):
+def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, lower_capacities: list[int] = None):
     max_possible_flow = sum(capacities[e]
                             for e, (u, _) in enumerate(edges) if u == s)
 
@@ -59,7 +66,8 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
     mf = None
     while low < high:
         mid = (low + high) // 2
-        mf = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=mid)
+        mf = max_flow_with_guess(
+            edges, capacities, s=s, t=t, optimal_flow=mid, lower_capacities=lower_capacities)
 
         if mf < mid:
             high = mid
