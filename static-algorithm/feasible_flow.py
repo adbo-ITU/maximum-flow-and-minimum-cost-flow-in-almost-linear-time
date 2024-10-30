@@ -23,10 +23,10 @@ def calc_feasible_flow(I_or: MinCostFlow):
         d = demands[v]
 
         if dh > d:
-            I.add_edge(v, v_star, c, 0, 2 * (dh - d))
+            I.add_edge(v_star, v, c, 0, 2 * (dh - d))
             init_flow = np.append(init_flow, dh - d)
         elif dh < d:
-            I.add_edge(v_star, v, c, 0, 2 * (d - dh))
+            I.add_edge(v, v_star, c, 0, 2 * (d - dh))
             init_flow = np.append(init_flow, d - dh)
 
     assert len(init_flow) == I.m
