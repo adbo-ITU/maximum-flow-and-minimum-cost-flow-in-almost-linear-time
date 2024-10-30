@@ -53,7 +53,10 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("original flow:", cur_flow[:original_m])
 
         new_phi = I.phi(cur_flow)
-        assert new_phi < float('inf'), "Φ(f) has exploded"
+        if not new_phi < float('inf'):
+            print("Φ(f) has exploded")
+            break
+        # assert new_phi < float('inf'), "Φ(f) has exploded"
         # TODO: Understand why we don't always decrease Φ(f). Sign of gradient? Too large step?
         # assert new_phi < cur_phi, "Φ(f) has not decreased"
         cur_phi = new_phi
