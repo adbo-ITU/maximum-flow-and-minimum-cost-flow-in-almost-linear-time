@@ -15,7 +15,6 @@ def calc_feasible_flow(I_or: MinCostFlow):
     assert np.sum(demands) == 0
 
     init_flow = (I.u_lower + I.u_upper) / 2
-    print(init_flow)
     d_hat = np.dot(I.B.transpose(), init_flow)
 
     c = 4 * I.m * I.U ** 2
