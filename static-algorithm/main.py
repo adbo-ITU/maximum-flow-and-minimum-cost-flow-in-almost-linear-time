@@ -53,7 +53,8 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
         else:
             low = mid + 1
 
-    return mf
+    # TODO: fix this, I'm pretty sure this can be off by one
+    return low
 
 
 if __name__ == "__main__":
