@@ -4,7 +4,7 @@ import numpy.linalg as LA
 from min_cost_flow_instance import MinCostFlow
 
 
-kappa = 0.082
+kappa = 1
 
 def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     l = I.calc_lengths(f)
