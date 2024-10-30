@@ -42,3 +42,14 @@ def get_dot(I: MinCostFlow, flow: Optional[List[int]] = None):
     dot += "\n}"
 
     return dot
+
+
+def get_the_russian_stuff(I: MinCostFlow):
+    lines = []
+
+    for i, edge in enumerate(I.edges):
+        u, v = edge
+        cap = I.u_upper[i]
+        lines.append(f'{u}-({cap})>{v}')
+
+    return "\n".join(lines)
