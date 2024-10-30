@@ -13,6 +13,8 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     I.print_B()
     print()
 
+    before_m = I.m
+
     I, cur_flow = calc_feasible_flow(I)
 
     print(I)
@@ -36,6 +38,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("  -> edges:", [I.edges[e]
               for e, c in enumerate(min_ratio_cycle) if c != 0])
         print("flow: ", cur_flow)
+        print("original flow:", cur_flow[:before_m])
         print()
 
     return cur_flow[-1]
