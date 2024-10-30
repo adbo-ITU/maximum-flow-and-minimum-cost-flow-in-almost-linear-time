@@ -15,7 +15,7 @@ def make_edges_and_capacities(graph):
     return edges, capacities, lower_capacities
 
 
-def test_flow_sample_from_cp_algorithms():
+def test_flow_sample_from_cp_algorithms_binary_search():
     # https://cp-algorithms.com/graph/edmonds_karp.html
     graph = [
         ((0, 1), 7),
@@ -34,7 +34,26 @@ def test_flow_sample_from_cp_algorithms():
     assert max_flow(edges, capacities, s=0, t=5) == 10
 
 
-def test_flow_sample_from_geeksforgeeks():
+def test_flow_sample_from_cp_algorithms_correct_guess():
+    # https://cp-algorithms.com/graph/edmonds_karp.html
+    graph = [
+        ((0, 1), 7),
+        ((0, 2), 4),
+        ((2, 1), 3),
+        ((1, 3), 5),
+        ((1, 4), 3),
+        ((2, 4), 2),
+        ((4, 3), 3),
+        ((3, 5), 8),
+        ((4, 5), 5),
+    ]
+
+    edges, capacities, _ = make_edges_and_capacities(graph)
+
+    assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=10) == 10
+
+
+def test_flow_sample_from_geeksforgeeks_binary_search():
     # https://www.geeksforgeeks.org/max-flow-problem-introduction/
     graph = [
         ((0, 1), 11),
@@ -70,7 +89,7 @@ def test_flow_sample_from_geeksforgeeks_correct_guess():
     assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23) == 23
 
 
-def test_idk():
+def test_idk_correct_guess():
     graph = [
         ((0, 1), 13),
         ((0, 2), 16),
