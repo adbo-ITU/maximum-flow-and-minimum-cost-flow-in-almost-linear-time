@@ -58,6 +58,8 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
 
         print()
 
+    print("rounded flow:", np.round(cur_flow[:original_m]))
+
     return round(cur_flow[flow_idx])
 
 
