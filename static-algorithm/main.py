@@ -4,9 +4,9 @@ from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
 
 
-def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int):
+def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int, lower_capacities: list[int] = None):
     I = MinCostFlow.from_max_flow_instance(
-        edges=edges, s=s, t=t, optimal_flow=optimal_flow, capacities=capacities)
+        edges=edges, s=s, t=t, optimal_flow=optimal_flow, capacities=capacities, lower_capacities=lower_capacities)
 
     print(I)
     print()
@@ -44,7 +44,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     return cur_flow[-1]
 
 
-def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int):
+def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, lower_capacities: list[int] = None):
     max_possible_flow = sum(capacities[e]
                             for e, (u, _) in enumerate(edges) if u == s)
 
@@ -52,7 +52,8 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
     mf = None
     while low < high:
         mid = (low + high) // 2
-        mf = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=mid)
+        mf = max_flow_with_guess(
+            edges, capacities, s=s, t=t, optimal_flow=mid, lower_capacities=lower_capacities)
 
         if mf < mid:
             high = mid

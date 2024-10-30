@@ -72,12 +72,16 @@ class MinCostFlow:
             print(f"{e: <2} {str(self.edges[e]): <7}", row)
 
     @staticmethod
-    def from_max_flow_instance(edges: list[Tuple[int, int]], s: int, t: int, optimal_flow: int, capacities: list[int]):
+    def from_max_flow_instance(edges: list[Tuple[int, int]], s: int, t: int, optimal_flow: int, capacities: list[int], lower_capacities: list[int] = None):
         new_edges = edges + [(t, s)]
 
         c = np.zeros(len(new_edges), dtype=float)
         c[-1] = -1
-        u_lower = np.zeros(len(new_edges), dtype=float)
+        if lower_capacities is None:
+            u_lower = np.zeros(len(new_edges), dtype=float)
+        else:
+            u_lower = np.array(lower_capacities + [0])
+
         u_upper = np.array(capacities + [sum(capacities)])
 
         I = MinCostFlow(edges=new_edges, u_lower=u_lower,
