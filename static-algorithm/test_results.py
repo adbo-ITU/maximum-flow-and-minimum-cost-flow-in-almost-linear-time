@@ -45,6 +45,24 @@ def test_flow_sample_from_geeksforgeeks():
     assert max_flow(edges, capacities, s=0, t=5) == 23
 
 
+def test_flow_sample_from_geeksforgeeks_correct_guess():
+    # https://www.geeksforgeeks.org/max-flow-problem-introduction/
+    graph = [
+        ((0, 1), 11),
+        ((0, 2), 12),
+        ((2, 1), 1),
+        ((1, 3), 12),
+        ((2, 4), 11),
+        ((4, 3), 7),
+        ((3, 5), 19),
+        ((4, 5), 4),
+    ]
+
+    edges, capacities = make_edges_and_capacities(graph)
+
+    assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23) == 23
+
+
 def test_idk():
     graph = [
         ((0, 1), 13),
