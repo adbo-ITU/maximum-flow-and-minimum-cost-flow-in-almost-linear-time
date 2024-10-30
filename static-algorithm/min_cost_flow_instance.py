@@ -99,8 +99,6 @@ class MinCostFlow:
         barrier = np.sum(upper_barriers + lower_barriers)
 
         phi = objective + barrier
-        if phi == float('inf'):
-            raise Exception("Φ has exploded")
 
         return phi
 
