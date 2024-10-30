@@ -94,7 +94,11 @@ class MinCostFlow:
         lower_barriers = (f - self.u_lower) ** (-self.alpha)
         barrier = np.sum(upper_barriers + lower_barriers)
 
-        return objective + barrier
+        phi = objective + barrier
+        if phi == float('inf'):
+            raise Exception("Φ has exploded")
+
+        return phi
 
     def calc_gradients(self, f: np.ndarray) -> np.ndarray:
         cur_cost = np.dot(self.c, f)
