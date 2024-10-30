@@ -29,13 +29,18 @@ class MinCostFlow:
         self.m = len(edges)
         self.n = len(set(v for e in edges for v in e)) + 1
         self.edges = edges
-        self.c = c
+        self.c_org = c
         self.u_lower = u_lower
         self.u_upper = u_upper
         self.optimal_cost = optimal_cost
         self.U = max(np.max(np.abs(self.u_upper)),
                      np.max(np.abs(self.u_lower)))
         self.alpha = 1 / np.log2(1000 * self.m * self.U)
+
+        rand_cost = np.random.randint(
+            1, 2*self.m*self.U+1, size=self.m) / (4 * self.m**2 * self.U**2)
+
+        self.c = c + rand_cost
 
         assert len(
             self.edges) == self.m, f"Number of elements does not match: len(edges) = {len(self.edges)}, m = {self.m}"
