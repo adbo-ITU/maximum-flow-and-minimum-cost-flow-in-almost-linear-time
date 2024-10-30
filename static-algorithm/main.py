@@ -72,7 +72,7 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
     max_possible_flow = sum(capacities[e]
                             for e, (u, _) in enumerate(edges) if u == s)
 
-    low, high = 0, max_possible_flow
+    low, high = 0, max_possible_flow+1
     mf = None
     while low < high:
         mid = (low + high) // 2
@@ -85,7 +85,7 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
             low = mid + 1
 
     # TODO: fix this, I'm pretty sure this can be off by one
-    return low
+    return mf
 
 
 if __name__ == "__main__":
