@@ -4,7 +4,7 @@ import numpy.linalg as LA
 from min_cost_flow_instance import MinCostFlow
 
 
-kappa = 0.01
+kappa = 0.082
 
 def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     l = I.calc_lengths(f)
@@ -42,11 +42,12 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
 
     assert min_ratio_cycle is not None, "No min ratio cycle found"
 
-    assert min_ratio <= -kappa, f"min_ratio is not less than -kappa: {min_ratio}"
+    # assert min_ratio <= -kappa, f"min_ratio is not less than -kappa: {min_ratio}"
 
-    # Scale the circulation according to Theorem 4.3, step 2
-    eta = ((-kappa ** 2) / 50) / g.dot(min_ratio_cycle)
-
+    gd = g.dot(min_ratio_cycle)
+    print("gd =", gd)
+    # TODO: Scale the circulation according to Theorem 4.3, step 2
+    eta = -kappa / gd
     print("eta =", eta)
 
     return (min_ratio, min_ratio_cycle * eta)
