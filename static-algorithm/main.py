@@ -27,6 +27,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     print()
 
 
+    # TODO: Understand why the paper's threshold is too small
     # threshold = float(I.m * I.U) ** (-10)
     threshold = 1e-5
     print("Threshold:", threshold)
@@ -53,6 +54,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
 
         new_phi = I.phi(cur_flow)
         assert new_phi < float('inf'), "Φ(f) has exploded"
+        # TODO: Understand why we don't always decrease Φ(f). Sign of gradient? Too large step?
         # assert new_phi < cur_phi, "Φ(f) has not decreased"
         cur_phi = new_phi
 

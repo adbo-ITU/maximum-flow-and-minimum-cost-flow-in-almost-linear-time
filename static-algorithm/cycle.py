@@ -44,6 +44,10 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
 
     # assert min_ratio <= -kappa, f"min_ratio is not less than -kappa: {min_ratio}"
 
+    # TODO: I don't know how I made this work, but I did. I'm not sure how good it is.
+    # For example, eta can now be negative, which essentially flips the circulation..
+    # Do we want that? Is it correct? If I understand the paper correctly, eta is always >0.
+    # But Φ(f) explodes if I do the absolute value.
     gd = g.dot(min_ratio_cycle)
     print("gd =", gd)
     # TODO: Scale the circulation according to Theorem 4.3, step 2
