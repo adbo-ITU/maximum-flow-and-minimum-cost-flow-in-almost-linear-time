@@ -162,3 +162,17 @@ def test_flow_lower_and_upper_correct_guess():
 
     assert max_flow_with_guess(edges, capacities, s=0, t=5,
                     lower_capacities=lower_capacities, optimal_flow=15) == 15
+
+
+def test_thore_fractional_graph_correct_guess():
+    graph = [
+        ((0, 1), 1),
+        ((0, 2), 1),
+        ((1, 3), 1),
+        ((2, 3), 1),
+        ((3, 4), 1),
+    ]
+
+    edges, capacities, _ = make_edges_and_capacities(graph)
+
+    assert max_flow_with_guess(edges, capacities, s=0, t=4, optimal_flow=1) == 1
