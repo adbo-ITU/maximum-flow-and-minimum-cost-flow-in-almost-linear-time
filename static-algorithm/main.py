@@ -8,16 +8,18 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     I = MinCostFlow.from_max_flow_instance(
         edges=edges, s=s, t=t, optimal_flow=optimal_flow, capacities=capacities, lower_capacities=lower_capacities)
 
+    print("Initial instance:")
     print(I)
     print()
     I.print_B()
     print()
 
-    before_m = I.m
-
+    original_m = I.m
     I, cur_flow = calc_feasible_flow(I)
 
+    print("Feasible flow instance:")
     print(I)
+    print("initial_flow:", cur_flow)
     print()
     I.print_B()
     print()
@@ -38,7 +40,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("  -> edges:", [I.edges[e]
               for e, c in enumerate(min_ratio_cycle) if c != 0])
         print("flow: ", cur_flow)
-        print("original flow:", cur_flow[:before_m])
+        print("original flow:", cur_flow[:original_m])
         print()
 
     return cur_flow[-1]
