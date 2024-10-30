@@ -22,10 +22,13 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
 
     threshold = float(I.m * I.U) ** (-10)
     i = 0
+    cur_phi = I.phi(cur_flow)
     while I.c.dot(cur_flow) - I.optimal_cost >= threshold:
         i += 1
         print("Iteration", i)
-        print("Φ(f) =", I.phi(cur_flow))
+        print("Φ(f) =", cur_phi)
+
+        assert cur_phi < float('inf'), "Φ(f) has exploded"
 
         min_ratio, min_ratio_cycle = find_min_ratio_cycle(I, cur_flow)
 
@@ -36,6 +39,12 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("  -> edges:", [I.edges[e]
               for e, c in enumerate(min_ratio_cycle) if c != 0])
         print("flow: ", cur_flow)
+
+        new_phi = I.phi(cur_flow)
+        assert new_phi < float('inf'), "Φ(f) has exploded"
+        assert new_phi < cur_phi, "Φ(f) has not decreased"
+        cur_phi = new_phi
+
         print()
 
     return cur_flow[-1]
