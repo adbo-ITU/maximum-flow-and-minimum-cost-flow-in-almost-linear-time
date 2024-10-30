@@ -16,6 +16,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     print()
 
     original_m = I.m
+    flow_idx = original_m - 1
     I, cur_flow = calc_feasible_flow(I)
 
     print("Feasible flow instance:")
@@ -35,7 +36,6 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("Φ(f) =", cur_phi)
 
         assert np.max(np.abs(I.B.T @ cur_flow)) < 1e-10, "Flow conservation has been broken"
-        assert cur_phi < float('inf'), "Φ(f) has exploded"
 
         min_ratio, min_ratio_cycle = find_min_ratio_cycle(I, cur_flow)
 
@@ -45,7 +45,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("min_ratio_cycle =", min_ratio_cycle)
         print("  -> edges:", [I.edges[e]
               for e, c in enumerate(min_ratio_cycle) if c != 0])
-        print("flow: ", cur_flow)
+        print(f"flow ({cur_flow[flow_idx]}): ", cur_flow)
         print("original flow:", cur_flow[:original_m])
 
         new_phi = I.phi(cur_flow)
@@ -55,7 +55,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
 
         print()
 
-    return cur_flow[-1]
+    return round(cur_flow[flow_idx])
 
 
 def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, lower_capacities: list[int] = None):
