@@ -19,10 +19,14 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     for cycle in cycles:
         circulation = np.zeros(I.m, dtype=float)
 
-        for edge in cycle:
-            circulation[edge] = I.B[edge, I.edges[edge][0]]
+        for i, edge in enumerate(cycle):
+            nex = cycle[(i + 1) % len(cycle)]
+            a, b = I.edges[edge]
+            if I.edges[nex][0] == a or I.edges[nex][1] == a:
+                circulation[edge] = I.B[edge, a]
+            else:
+                circulation[edge] = I.B[edge, b]
 
-        print(circulation)
         for dir in [1, -1]:
             delta = dir * circulation
 
