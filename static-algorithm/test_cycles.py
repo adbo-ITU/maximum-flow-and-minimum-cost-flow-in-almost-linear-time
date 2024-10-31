@@ -47,11 +47,12 @@ def test_triangle_two_pairs():
     # 0 -> 1 -> 2 -> 0 (0,2,4)
     # 0 -> 1 -> 2 -> 1 (1,2,4)
     # 0 -> 1 -> 2 -> 0 (0,3,4)
+    # 0 -> 1 -> 2 -> 0 (1,3,4)
 
     # abusable but works, for now
     correct_cycles = [set([0, 1]), set([2, 3]), set(
-        [4, 1, 2]), set([4, 0, 2]), set([4, 0, 3])]
+        [0, 2, 4]), set([1, 2, 4]), set([0, 3, 4]), set([1, 3, 4])]
     cycles = find_all_cycles(create_dummy_instance(edges))
     print(cycles, correct_cycles)
-    assert len(cycles) == 5
+    assert len(cycles) == 6
     assert all(set(cycle) in correct_cycles for cycle in cycles)
