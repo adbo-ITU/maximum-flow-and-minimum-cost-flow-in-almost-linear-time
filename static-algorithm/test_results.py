@@ -53,6 +53,46 @@ def test_flow_sample_from_cp_algorithms_correct_guess():
     assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=10) == 10
 
 
+def test_flow_real_sample_from_geeksforgeeks_correct_guess():
+    # https://www.geeksforgeeks.org/max-flow-problem-introduction/
+    graph = [
+        ((0, 1), 16),
+        ((0, 2), 13),
+        ((1, 2), 10),
+        ((2, 1), 4),
+        ((1, 3), 12),
+        ((2, 4), 14),
+        ((3, 2), 9),
+        ((4, 3), 7),
+        ((3, 5), 20),
+        ((4, 5), 4),
+    ]
+
+    edges, capacities, _ = make_edges_and_capacities(graph)
+
+    assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23) == 23
+
+
+def test_flow_real_sample_from_geeksforgeeks_binary_search():
+    # https://www.geeksforgeeks.org/max-flow-problem-introduction/
+    graph = [
+        ((0, 1), 16),
+        ((0, 2), 13),
+        ((1, 2), 10),
+        ((2, 1), 4),
+        ((1, 3), 12),
+        ((2, 4), 14),
+        ((3, 2), 9),
+        ((4, 3), 7),
+        ((3, 5), 20),
+        ((4, 5), 4),
+    ]
+
+    edges, capacities, _ = make_edges_and_capacities(graph)
+
+    assert max_flow(edges, capacities, s=0, t=5) == 23
+
+
 def test_flow_sample_from_geeksforgeeks_binary_search():
     # https://www.geeksforgeeks.org/max-flow-problem-introduction/
     graph = [
