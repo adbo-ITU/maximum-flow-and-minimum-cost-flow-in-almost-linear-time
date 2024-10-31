@@ -14,6 +14,8 @@ def assert_valid_solution(graph: Graph, s: int, t: int, flow: list[int], flow_va
 
     assert actual_max_flow == flow_value, f"Expected max flow {flow_value}, got {actual_max_flow}"
 
+    assert_flow_is_valid(edges, capacities, flow=flow, s=s, t=t)
+
     flow_from_s, flow_to_t = 0, 0
     for e, (u, v) in enumerate(edges):
         if u == s:
@@ -23,8 +25,6 @@ def assert_valid_solution(graph: Graph, s: int, t: int, flow: list[int], flow_va
 
     assert flow_from_s == flow_value, f"Flow from s = {flow_from_s}, expected {flow_value}"
     assert flow_from_s == flow_to_t, f"Flow conservation not satisfied: flow from s = {flow_from_s}, flow to t = {flow_to_t}"
-
-    assert_flow_is_valid(edges, capacities, flow=flow, s=s, t=t)
 
 
 def assert_flow_is_valid(edges: list[tuple[int, int]], capacities: list[int], flow: list[int], s: int, t: int):
