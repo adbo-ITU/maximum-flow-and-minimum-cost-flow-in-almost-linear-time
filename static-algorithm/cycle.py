@@ -2,6 +2,8 @@ import networkx as nx
 import numpy as np
 import numpy.linalg as LA
 from min_cost_flow_instance import MinCostFlow
+from typing import Tuple, Set, List
+from itertools import combinations
 
 kappa = 10
 
@@ -69,6 +71,8 @@ def find_all_cycles(I: MinCostFlow):
     pair_cycles = []
     for cycle in nx.simple_cycles(G):
         cycle_edges = []
+        pair_edges = set()
+
         for i in range(len(cycle)):
             a = cycle[i]
             b = cycle[(i + 1) % len(cycle)]
@@ -76,53 +80,45 @@ def find_all_cycles(I: MinCostFlow):
             # TODO: handle parallel edges
             edges = I.undirected_edge_to_indices[(a, b)]
             if len(edges) > 1:
-                pair_cycles.append(cycle)
-                break
-            else:
-                cycle_edges.append(edges[0])
-        else:
-            check_if_visited(cycle_edges, visited_cycles, cycles)
-    cycles.extend(handle_pair_cycles(I, pair_cycles))
+                pair_edges.add(edges[0])
+            cycle_edges.append(edges[0])
+
+        if len(pair_edges) > 0:
+            pair_cycles.append((cycle_edges, pair_edges))
+
+        if len(cycle_edges) == 2 and cycle_edges[0] == cycle_edges[1]:
+            continue
+        check_if_visited(cycle_edges, visited_cycles, cycles)
+
+    cycles.extend(handle_pair_cycles(I, visited_cycles, pair_cycles))
 
     return cycles
 
 
-def handle_pair_cycles(I: MinCostFlow, pair_cycles: list[list[int]]):
-    visited_cycles = set()
+def handle_pair_cycles(I: MinCostFlow, visited_cycles: Set[List[int]], pair_cycles: List[Tuple[List[int], Set[int]]]):
     cycles = []
-    for cycle in pair_cycles:
-        pair_edges = set()
-        normal_edges = []
+    for (cycle, pair_edges) in pair_cycles:
+        for amount_to_replace in range(1, len(pair_edges) + 1):
+            for edges_to_replace in combinations(pair_edges, amount_to_replace):
+                G = nx.MultiGraph(resolve_edges(I, cycle))
+                for new_cycle in nx.simple_cycles(G):
+                    cycle_edges = []
+                    for i in range(len(new_cycle)):
+                        a = new_cycle[i]
+                        b = new_cycle[(i + 1) % len(new_cycle)]
 
-        for i in range(len(cycle)):
-            a = cycle[i]
-            b = cycle[(i + 1) % len(cycle)]
+                        edges = I.undirected_edge_to_indices[(a, b)]
+                        edges = [e for e in edges if e not in edges_to_replace]
+                        cycle_edges.append(edges[0])
 
-            edges = I.undirected_edge_to_indices[(a, b)]
-            if len(edges) > 1:
-                pair_edges = pair_edges.union(edges)
-                check_if_visited(edges, visited_cycles, cycles)
-            else:
-                normal_edges.append(edges[0])
+                    if len(cycle_edges) == 2 and cycle_edges[0] == cycle_edges[1]:
+                        continue
+                    check_if_visited(cycle_edges, visited_cycles, cycles)
+        for edge in pair_edges:
+            a, b = I.edges[edge]
 
-        pair_edges = list(pair_edges)
-        for i, pair_edge in enumerate(pair_edges):
-            exclude = pair_edges[:i] + pair_edges[i + 1:]
-
-            G = nx.MultiGraph(resolve_edges(I, normal_edges + exclude))
-            for cycle in nx.simple_cycles(G):
-                cycle_edges = []
-                for i in range(len(cycle)):
-                    a = cycle[i]
-                    b = cycle[(i + 1) % len(cycle)]
-
-                    edges = I.undirected_edge_to_indices[(a, b)]
-                    edges = [e for e in edges if e != pair_edge]
-                    cycle_edges.append(edges[0])
-
-                if len(cycle_edges) == 2 and cycle_edges[0] == cycle_edges[1]:
-                    continue
-                check_if_visited(cycle_edges, visited_cycles, cycles)
+            check_if_visited(
+                I.undirected_edge_to_indices[(a, b)], visited_cycles, cycles)
     return cycles
 
 
