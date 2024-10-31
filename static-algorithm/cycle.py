@@ -3,8 +3,8 @@ import numpy as np
 import numpy.linalg as LA
 from min_cost_flow_instance import MinCostFlow
 
-
 kappa = 10
+
 
 def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     l = I.calc_lengths(f)
@@ -14,20 +14,15 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     min_ratio = float('inf')
     min_ratio_cycle = None
 
-    G = nx.MultiGraph(I.edges)
+    cycles = find_all_cycles(I)
     # TODO: handle parallel edges - they are not returned as multiple cycles
-    for cycle in nx.simple_cycles(G):
+    for cycle in cycles:
         circulation = np.zeros(I.m, dtype=float)
 
-        for i in range(len(cycle)):
-            a = cycle[i]
-            b = cycle[(i + 1) % len(cycle)]
+        for edge in cycle:
+            circulation[edge] = I.B[edge, I.edges[edge][0]]
 
-            # TODO: handle parallel edges
-            e = I.undirected_edge_to_indices[(a, b)][0]
-
-            circulation[e] = I.B[e, a]
-
+        print(circulation)
         for dir in [1, -1]:
             delta = dir * circulation
 
@@ -55,3 +50,79 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     print("eta =", eta)
 
     return (min_ratio, min_ratio_cycle * eta)
+
+
+def find_all_cycles(I: MinCostFlow):
+    G = nx.MultiGraph(I.edges)
+
+    visited_cycles = set()
+    cycles = []
+    pair_cycles = []
+    for cycle in nx.simple_cycles(G):
+        cycle_edges = []
+        for i in range(len(cycle)):
+            a = cycle[i]
+            b = cycle[(i + 1) % len(cycle)]
+
+            # TODO: handle parallel edges
+            edges = I.undirected_edge_to_indices[(a, b)]
+            if len(edges) > 1:
+                pair_cycles.append(cycle)
+                break
+            else:
+                cycle_edges.append(edges[0])
+        else:
+            check_if_visited(cycle_edges, visited_cycles, cycles)
+    cycles.extend(handle_pair_cycles(I, pair_cycles))
+
+    return cycles
+
+
+def handle_pair_cycles(I: MinCostFlow, pair_cycles: list[list[int]]):
+    visited_cycles = set()
+    cycles = []
+    for cycle in pair_cycles:
+        pair_edges = set()
+        normal_edges = []
+
+        for i in range(len(cycle)):
+            a = cycle[i]
+            b = cycle[(i + 1) % len(cycle)]
+
+            edges = I.undirected_edge_to_indices[(a, b)]
+            if len(edges) > 1:
+                pair_edges = pair_edges.union(edges)
+                check_if_visited(edges, visited_cycles, cycles)
+            else:
+                normal_edges.append(edges[0])
+
+        pair_edges = list(pair_edges)
+        for i, pair_edge in enumerate(pair_edges):
+            exclude = pair_edges[:i] + pair_edges[i + 1:]
+
+            G = nx.MultiGraph(resolve_edges(I, normal_edges + exclude))
+            for cycle in nx.simple_cycles(G):
+                cycle_edges = []
+                for i in range(len(cycle)):
+                    a = cycle[i]
+                    b = cycle[(i + 1) % len(cycle)]
+
+                    edges = I.undirected_edge_to_indices[(a, b)]
+                    edges = [e for e in edges if e != pair_edge]
+                    cycle_edges.append(edges[0])
+
+                if len(cycle_edges) == 2 and cycle_edges[0] == cycle_edges[1]:
+                    continue
+                check_if_visited(cycle_edges, visited_cycles, cycles)
+    return cycles
+
+
+def resolve_edges(I: MinCostFlow, edge_indices: list[int]):
+    return [I.edges[a] for a in edge_indices]
+
+
+def check_if_visited(cycle_edges: list[int], visited_cycles: set, cycles: list[int]):
+    sorted_cycle_edges = tuple(sorted(cycle_edges))
+    if sorted_cycle_edges not in visited_cycles:
+        visited_cycles.add(sorted_cycle_edges)
+        cycles.append(cycle_edges)
