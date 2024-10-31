@@ -129,6 +129,19 @@ def test_flow_sample_from_geeksforgeeks_correct_guess():
     assert max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23) == 23
 
 
+def test_flow_parallel_edge_correct_guess():
+    graph = [
+        ((0, 1), 5),
+        ((2, 1), 1),
+        ((1, 2), 6),
+        ((2, 3), 7),
+    ]
+
+    edges, capacities, _ = make_edges_and_capacities(graph)
+
+    assert max_flow_with_guess(edges, capacities, s=0, t=3, optimal_flow=5) == 5
+
+
 def test_idk_binary_search():
     graph = [
         ((0, 1), 13),
