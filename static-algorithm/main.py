@@ -65,7 +65,7 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
 
     print("rounded flow:", np.round(cur_flow[:original_m]))
 
-    return round(cur_flow[flow_idx])
+    return round(cur_flow[flow_idx]), np.round(cur_flow[:flow_idx])
 
 
 def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, lower_capacities: list[int] = None):
@@ -73,10 +73,10 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
                             for e, (u, _) in enumerate(edges) if u == s)
 
     low, high = 0, max_possible_flow+1
-    mf = None
+    mf, flows = None, None
     while low < high:
         mid = (low + high) // 2
-        mf = max_flow_with_guess(
+        mf, flows = max_flow_with_guess(
             edges, capacities, s=s, t=t, optimal_flow=mid, lower_capacities=lower_capacities)
 
         if mf < mid:
@@ -85,7 +85,7 @@ def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int
             low = mid + 1
 
     # TODO: fix this, I'm pretty sure this can be off by one
-    return mf
+    return mf, flows
 
 
 if __name__ == "__main__":
