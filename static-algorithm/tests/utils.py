@@ -1,4 +1,12 @@
-def make_edges_and_capacities(graph):
+from typing import List, Tuple, Union
+
+
+Edge = Tuple[int, int]
+EdgeSpec = Union[Tuple[Edge, int], Tuple[Edge, int, int]]
+Graph = List[EdgeSpec]
+
+
+def make_edges_and_capacities(graph: Graph):
     edges = [e[0] for e in graph]
 
     if len(graph[0]) == 3:
