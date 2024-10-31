@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Optional
 import numpy as np
 
 
@@ -17,6 +17,8 @@ class MinCostFlow:
     B: np.ndarray
 
     undirected_edge_to_indices: dict[Tuple[int, int], list[int]]
+
+    cycle_cache: Optional[list[list[int]]] = None
 
     def __init__(
         self,

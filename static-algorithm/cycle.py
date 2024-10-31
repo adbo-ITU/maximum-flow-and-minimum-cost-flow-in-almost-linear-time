@@ -14,7 +14,12 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     min_ratio = float('inf')
     min_ratio_cycle = None
 
-    cycles = find_all_cycles(I)
+    if I.cycle_cache is None:
+        cycles = find_all_cycles(I)
+        I.cycle_cache = cycles
+    else:
+        cycles = I.cycle_cache
+
     # TODO: handle parallel edges - they are not returned as multiple cycles
     for cycle in cycles:
         circulation = np.zeros(I.m, dtype=float)
