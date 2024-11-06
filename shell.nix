@@ -1,3 +1,6 @@
+let
+  unstable = import (fetchTarball "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz") { };
+in
 with (import <nixpkgs> {});
 let
   python-packages = ps:
@@ -8,7 +11,7 @@ let
     ];
 in
   mkShellNoCC {
-    packages = with pkgs; [
+    packages = with unstable; [
       poetry
       ((python3.withPackages python-packages).override (args: {ignoreCollisions = true;}))
     ];
