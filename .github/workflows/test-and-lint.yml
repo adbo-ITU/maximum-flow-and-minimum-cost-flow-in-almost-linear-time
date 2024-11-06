@@ -22,7 +22,7 @@ jobs:
         run: make ruff
       - name: Export PATH
         run: |
-          poetryPath = $(poetry env info --path)/bin
+          poetryPath="$(poetry env info --path)/bin"
           echo "$poetryPath" >> $GITHUB_PATH
           cp $poetryPath/basedpyright $poetryPath/pyright
       - name: Run Pyright
