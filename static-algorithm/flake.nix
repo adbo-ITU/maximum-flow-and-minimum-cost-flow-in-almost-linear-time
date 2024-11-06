@@ -20,7 +20,7 @@
             projectDir = self;
 
             # set this to true to use premade wheels rather than the source
-            preferWheels = false;
+            preferWheels = true;
             overrides = poetry2nix.defaultPoetryOverrides.extend
               (self: super: {
                 pyright = super.pyright.overridePythonAttrs
