@@ -1,6 +1,8 @@
 from collections import defaultdict, deque
 from tests.utils import Edge
 
+# all credit to Riko Jacob for this code
+
 
 def find_max_flow(edges: list[Edge], capacities: list[int], s: int, t: int):
     graph = defaultdict(lambda: defaultdict(lambda: 0))
@@ -8,7 +10,7 @@ def find_max_flow(edges: list[Edge], capacities: list[int], s: int, t: int):
     for (u, v), capacity in zip(edges, capacities):
         graph[u][v] = capacity
 
-    max_flow, flow_graph, _ = find_max_flow_inner(graph, s, t)
+    max_flow, flow_graph, _ = flow(graph, s, t)
 
     flow_edges = []
     for u, d in flow_graph.items():
@@ -21,59 +23,61 @@ def find_max_flow(edges: list[Edge], capacities: list[int], s: int, t: int):
     return max_flow, flow_edges
 
 
-def bfs(graph, source, sink, min_capacity=0):
-    parent = dict()
-    queue = deque([source])
-
-    while queue:
-        u = queue.popleft()
-
-        for v, capacity in graph[u].items():
-            if capacity > min_capacity and v not in parent:
-                parent[v] = u
-                queue.append(v)
-
-                if v == sink:
-                    path = []
-                    cur = sink
-                    while source != cur:
-                        prev = parent[cur]
-                        path.append((prev, cur))
-                        cur = prev
-
-                    return (True, path)
-
+def bfs(graph, src, dest, mincap=0):  # returns path to dest
+    parent = {src: src}
+    layer = [src]
+    while layer:
+        nextlayer = []
+        for u in layer:
+            for v, cap in graph[u].items():
+                if cap > mincap and v not in parent:
+                    parent[v] = u
+                    nextlayer.append(v)
+                    if v == dest:
+                        p = []
+                        current_vertex = dest
+                        while src != current_vertex:
+                            p.append((parent[current_vertex], current_vertex))
+                            current_vertex = parent[current_vertex]
+                        return (True, p)
+        layer = nextlayer
     return (False, set(parent))
 
 
-def find_max_flow_inner(original_graph, source, sink):
-    graph = defaultdict(lambda: defaultdict(lambda: 0))
-    max_capacity = 0
-
-    for u, d in original_graph.items():
+def flow(orggraph, src, dest):
+    graph = defaultdict(lambda: defaultdict(int))
+    maxcapacity = 0
+    for u, d in orggraph.items():
         for v, c in d.items():
             graph[u][v] = c
-            max_capacity = max(max_capacity, c)
+            maxcapacity = max(maxcapacity, c)
 
     current_flow = 0
-    min_capacity = max_capacity
+    mincap = maxcapacity
     while True:
-        has_path, path = bfs(graph, source, sink, min_capacity)
-
-        if not has_path:
-            if min_capacity <= 0:
-                cut = path
-                return (current_flow, retain_only_active_edges(original_graph, graph), cut)
-
-            min_capacity //= 2
-            continue
-
-        path_flow = min(graph[u][v] for u, v in path)
-        current_flow += path_flow
-
-        for u, v in path:
-            graph[u][v] -= path_flow
-            graph[v][u] += path_flow
+        ispath, p_or_seen = bfs(graph, src, dest, mincap)
+        if not ispath:
+            if mincap > 0:
+                mincap = mincap // 2
+                continue
+            else:
+                return (
+                    current_flow,
+                    {
+                        a: {b: c - graph[a][b] for b, c in d.items() if graph[a][b] < c}
+                        for a, d in orggraph.items()
+                    },
+                    p_or_seen,
+                )
+        p = p_or_seen
+        saturation = min(graph[u][v] for u, v in p)
+        # for i in range(len(p)-1):
+        #     assert(p[i][0] == p[i+1][1])
+        # print(current_flow,saturation,file=sys.stderr)#,[f"{u[0]}-{u[1]}:{inp[u[0]][u[1]]}:{graph[u][v]}" for u,v in p if u[2]==0])
+        current_flow += saturation
+        for u, v in p:
+            graph[u][v] -= saturation
+            graph[v][u] += saturation
 
 
 def retain_only_active_edges(original_graph, graph):

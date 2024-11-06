@@ -1,4 +1,5 @@
-from main import max_flow, max_flow_with_guess
+from main import max_flow_with_guess
+from tests.find_max_flow import find_max_flow
 from tests.utils import make_edges_and_capacities
 import pytest
 
@@ -8,6 +9,13 @@ def test_flow_random_dag():
     edges, s, t = parse_input(INPUT)
     edges, capacities, _ = make_edges_and_capacities(edges)
     mf, _ = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=184)
+    assert mf == 184
+
+
+def test_rikos_code():
+    edges, s, t = parse_input(INPUT)
+    edges, capacities, _ = make_edges_and_capacities(edges)
+    mf, _ = find_max_flow(edges, capacities, s=s, t=t)
     assert mf == 184
 
 
