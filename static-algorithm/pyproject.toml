@@ -3,7 +3,6 @@ name = "static-algorithm"
 version = "0.1.0"
 description = ""
 authors = ["Adrian Borup <adrian@borup.com>", "albe2669 <albert@risenielsen.dk>"]
-package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -12,9 +11,16 @@ networkx = "^3.4.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
-ruff = "^0.7.2"
+ruff = "0.7.2"
 pyright = "^1.1.388"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.lint]
+ignore=["E741"]
+
+[tool.pyright]
+reportConstantRedefinition = false
+
