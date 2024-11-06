@@ -26,6 +26,8 @@ jobs:
           alias pyright=basedpyright
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
+        with:
+          version: PATH
 
   test:
     runs-on: ubuntu-latest
