@@ -1,20 +1,13 @@
 from cycle import find_all_cycles
 from min_cost_flow_instance import MinCostFlow
-from typing import List, Tuple
 import sys
 import numpy as np
 
 
-def create_dummy_instance(edges: List[Tuple[int, int]]):
+def create_dummy_instance(edges: list[tuple[int, int]]):
     zeroes = np.zeros(len(edges))
 
-    return MinCostFlow(
-        edges,
-        zeroes,
-        zeroes,
-        zeroes,
-        0
-    )
+    return MinCostFlow(edges, zeroes, zeroes, zeroes, 0)
 
 
 def test_triangle_one_pair():
@@ -50,8 +43,14 @@ def test_triangle_two_pairs():
     # 0 -> 1 -> 2 -> 0 (1,3,4)
 
     # abusable but works, for now
-    correct_cycles = [set([0, 1]), set([2, 3]), set(
-        [0, 2, 4]), set([1, 2, 4]), set([0, 3, 4]), set([1, 3, 4])]
+    correct_cycles = [
+        set([0, 1]),
+        set([2, 3]),
+        set([0, 2, 4]),
+        set([1, 2, 4]),
+        set([0, 3, 4]),
+        set([1, 3, 4]),
+    ]
     cycles = find_all_cycles(create_dummy_instance(edges))
     print(cycles, correct_cycles)
     assert len(cycles) == 6

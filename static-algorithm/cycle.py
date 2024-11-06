@@ -2,7 +2,6 @@ import networkx as nx
 import numpy as np
 from custom_types import FloatArrayType
 from min_cost_flow_instance import MinCostFlow
-from typing import Tuple, Set, List
 from itertools import combinations
 import min_ratio as mrlib
 
@@ -94,8 +93,8 @@ def find_all_cycles(I: MinCostFlow):
 
 def handle_pair_cycles(
     I: MinCostFlow,
-    visited_cycles: Set[List[int]],
-    pair_cycles: List[Tuple[List[int], Set[int]]],
+    visited_cycles: set[list[int]],
+    pair_cycles: list[tuple[list[int], set[int]]],
 ):
     cycles = []
     for cycle, pair_edges in pair_cycles:
@@ -128,7 +127,9 @@ def resolve_edges(I: MinCostFlow, edge_indices: list[int]):
     return [I.edges[a] for a in edge_indices]
 
 
-def check_if_visited(cycle_edges: list[int], visited_cycles: set, cycles: list[int]):
+def check_if_visited(
+    cycle_edges: list[int], visited_cycles: set[list[int]], cycles: list[int]
+):
     sorted_cycle_edges = tuple(sorted(cycle_edges))
     if sorted_cycle_edges not in visited_cycles:
         visited_cycles.add(sorted_cycle_edges)

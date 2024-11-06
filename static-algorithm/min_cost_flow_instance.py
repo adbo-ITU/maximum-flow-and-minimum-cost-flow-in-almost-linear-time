@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Optional
+from typing import Optional
 import numpy as np
 from custom_types import FloatArrayType
 import min_ratio as mrlib
@@ -9,7 +9,7 @@ import min_ratio as mrlib
 class MinCostFlow:
     m: int
     n: int
-    edges: list[Tuple[int, int]]
+    edges: list[tuple[int, int]]
     c: FloatArrayType
     u_upper: FloatArrayType
     u_lower: FloatArrayType
@@ -18,13 +18,13 @@ class MinCostFlow:
     alpha: float
     B: FloatArrayType
 
-    undirected_edge_to_indices: dict[Tuple[int, int], list[int]]
+    undirected_edge_to_indices: dict[tuple[int, int], list[int]]
 
     min_ratio_cycle_finder: Optional[mrlib.MinRatioCycleFinder] = None
 
     def __init__(
         self,
-        edges: list[Tuple[int, int]],
+        edges: list[tuple[int, int]],
         c: FloatArrayType,
         u_lower: FloatArrayType,
         u_upper: FloatArrayType,
@@ -75,7 +75,7 @@ class MinCostFlow:
 
     @staticmethod
     def from_max_flow_instance(
-        edges: list[Tuple[int, int]],
+        edges: list[tuple[int, int]],
         s: int,
         t: int,
         optimal_flow: int,
