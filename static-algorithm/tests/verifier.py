@@ -12,7 +12,7 @@ def assert_valid_solution(graph: Graph, s: int, t: int, flow: list[int], flow_va
 
     actual_max_flow, _ = find_max_flow(edges, capacities, s=s, t=t)
 
-    assert actual_max_flow == flow_value, f"Expected max flow {flow_value}, got {actual_max_flow}"
+    assert actual_max_flow == flow_value, f"Expected max flow {actual_max_flow}, got {flow_value}"
 
     assert_flow_is_valid(edges, capacities, flow=flow, s=s, t=t)
 
