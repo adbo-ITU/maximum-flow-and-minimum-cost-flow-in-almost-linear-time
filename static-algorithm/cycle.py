@@ -16,24 +16,15 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     min_ratio = float('inf')
     min_ratio_cycle = None
 
-    if I.cycle_cache is None:
+    if I.circulation_cache is None:
         cycles = find_all_cycles(I)
-        I.cycle_cache = cycles
+        circulations = get_circulations(I, cycles)
+        I.circulation_cache = circulations
     else:
-        cycles = I.cycle_cache
+        circulations = I.circulation_cache
 
     # TODO: handle parallel edges - they are not returned as multiple cycles
-    for cycle in cycles:
-        circulation = np.zeros(I.m, dtype=float)
-
-        for i, edge in enumerate(cycle):
-            nex = cycle[(i + 1) % len(cycle)]
-            a, b = I.edges[edge]
-            if I.edges[nex][0] == a or I.edges[nex][1] == a:
-                circulation[edge] = I.B[edge, a]
-            else:
-                circulation[edge] = I.B[edge, b]
-
+    for circulation in circulations:
         for dir in [1, -1]:
             delta = dir * circulation
 
@@ -61,6 +52,23 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     print("eta =", eta)
 
     return (min_ratio, min_ratio_cycle * eta)
+
+
+def get_circulations(I: MinCostFlow, cycles: list[list[int]]) -> list[np.ndarray]:
+    circulations = []
+    for cycle in cycles:
+        circulation = np.zeros(I.m, dtype=float)
+
+        for i, edge in enumerate(cycle):
+            nex = cycle[(i + 1) % len(cycle)]
+            a, b = I.edges[edge]
+            if I.edges[nex][0] == a or I.edges[nex][1] == a:
+                circulation[edge] = I.B[edge, a]
+            else:
+                circulation[edge] = I.B[edge, b]
+
+        circulations.append(circulation)
+    return circulations
 
 
 def find_all_cycles(I: MinCostFlow):
