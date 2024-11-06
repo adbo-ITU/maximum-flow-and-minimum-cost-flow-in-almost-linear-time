@@ -3,7 +3,7 @@ update:
 	poetry install
 
 build:
-	cd min_ratio && poetry -C ../ run maturin build --release
+	cd min_ratio && poetry -C ../ run maturin develop --release
 
 install:
 	poetry check
