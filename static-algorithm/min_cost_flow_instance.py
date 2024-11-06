@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 import numpy as np
 from custom_types import FloatArrayType
 import min_ratio as mrlib
@@ -20,7 +19,7 @@ class MinCostFlow:
 
     undirected_edge_to_indices: dict[tuple[int, int], list[int]]
 
-    min_ratio_cycle_finder: Optional[mrlib.MinRatioCycleFinder] = None
+    min_ratio_cycle_finder: mrlib.MinRatioCycleFinder | None = None
 
     def __init__(
         self,
@@ -80,7 +79,7 @@ class MinCostFlow:
         t: int,
         optimal_flow: int,
         capacities: list[int],
-        lower_capacities: list[int] = None,
+        lower_capacities: list[int] | None = None,
     ):
         new_edges = edges + [(t, s)]
 

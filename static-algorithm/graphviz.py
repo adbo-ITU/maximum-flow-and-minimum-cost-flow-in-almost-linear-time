@@ -1,9 +1,8 @@
 from min_cost_flow_instance import MinCostFlow
-from typing import Optional
 
 
 def get_dot_edge(
-    edge: tuple[int, int], lower: int, upper: int, cost: int, flow: Optional[int] = None
+    edge: tuple[int, int], lower: int, upper: int, cost: int, flow: int | None = None
 ):
     label = []
     label.append(f"caps={lower}/{upper}")
@@ -15,7 +14,7 @@ def get_dot_edge(
     return f'{u} -> {v} [label="' + "\\n".join(label) + '"];'
 
 
-def get_dot_graph(I: MinCostFlow, flow: Optional[list[int]] = None):
+def get_dot_graph(I: MinCostFlow, flow: list[int] | None = None):
     lines = []
 
     for i in range(I.n):
@@ -35,7 +34,7 @@ def get_dot_graph(I: MinCostFlow, flow: Optional[list[int]] = None):
     return lines
 
 
-def get_dot(I: MinCostFlow, flow: Optional[list[int]] = None):
+def get_dot(I: MinCostFlow, flow: list[int] | None = None):
     lines = []
     lines.append("rankdir=LR;")
     lines.extend(get_dot_graph(I, flow))

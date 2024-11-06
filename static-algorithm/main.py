@@ -10,7 +10,7 @@ def max_flow_with_guess(
     s: int,
     t: int,
     optimal_flow: int,
-    lower_capacities: list[int] = None,
+    lower_capacities: list[int] | None = None,
 ):
     I = MinCostFlow.from_max_flow_instance(
         edges=edges,
@@ -87,7 +87,7 @@ def max_flow(
     capacities: list[int],
     s: int,
     t: int,
-    lower_capacities: list[int] = None,
+    lower_capacities: list[int] | None = None,
 ):
     max_possible_flow = sum(capacities[e] for e, (u, _) in enumerate(edges) if u == s)
 
