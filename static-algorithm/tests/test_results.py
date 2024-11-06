@@ -1,5 +1,6 @@
 from main import max_flow, max_flow_with_guess
 from tests.utils import make_edges_and_capacities
+from tests.verifier import assert_valid_solution
 
 
 # https://cp-algorithms.com/graph/edmonds_karp.html
@@ -18,14 +19,14 @@ CP_ALGORITHMS_GRAPH = [
 
 def test_flow_sample_from_cp_algorithms_binary_search():
     edges, capacities, _ = make_edges_and_capacities(CP_ALGORITHMS_GRAPH)
-    mf, _ = max_flow(edges, capacities, s=0, t=5)
-    assert mf == 10
+    mf, flows = max_flow(edges, capacities, s=0, t=5)
+    assert_valid_solution(CP_ALGORITHMS_GRAPH, 0, 5, flows, mf)
 
 
 def test_flow_sample_from_cp_algorithms_correct_guess():
     edges, capacities, _ = make_edges_and_capacities(CP_ALGORITHMS_GRAPH)
-    mf, _ = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=10)
-    assert mf == 10
+    mf, flows = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=10)
+    assert_valid_solution(CP_ALGORITHMS_GRAPH, 0, 5, flows, mf)
 
 
 # https://www.geeksforgeeks.org/max-flow-problem-introduction/
@@ -45,14 +46,14 @@ GEEKS_FOR_GEEKS_GRAPH = [
 
 def test_flow_real_sample_from_geeksforgeeks_correct_guess():
     edges, capacities, _ = make_edges_and_capacities(GEEKS_FOR_GEEKS_GRAPH)
-    mf, _ = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23)
-    assert mf == 23
+    mf, flows = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23)
+    assert_valid_solution(GEEKS_FOR_GEEKS_GRAPH, 0, 5, flows, mf)
 
 
 def test_flow_real_sample_from_geeksforgeeks_binary_search():
     edges, capacities, _ = make_edges_and_capacities(GEEKS_FOR_GEEKS_GRAPH)
-    mf, _ = max_flow(edges, capacities, s=0, t=5)
-    assert mf == 23
+    mf, flows = max_flow(edges, capacities, s=0, t=5)
+    assert_valid_solution(GEEKS_FOR_GEEKS_GRAPH, 0, 5, flows, mf)
 
 
 # Previous graph but use the graph of the optimal flow. Useful because
@@ -72,15 +73,15 @@ GEEKS_FOR_GEEKS_MAXFLOW_GRAPH = [
 def test_flow_sample_from_geeksforgeeks_binary_search():
     edges, capacities, _ = make_edges_and_capacities(
         GEEKS_FOR_GEEKS_MAXFLOW_GRAPH)
-    mf, _ = max_flow(edges, capacities, s=0, t=5)
-    assert mf == 23
+    mf, flows = max_flow(edges, capacities, s=0, t=5)
+    assert_valid_solution(GEEKS_FOR_GEEKS_MAXFLOW_GRAPH, 0, 5, flows, mf)
 
 
 def test_flow_sample_from_geeksforgeeks_correct_guess():
     edges, capacities, _ = make_edges_and_capacities(
         GEEKS_FOR_GEEKS_MAXFLOW_GRAPH)
-    mf, _ = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23)
-    assert mf == 23
+    mf, flows = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23)
+    assert_valid_solution(GEEKS_FOR_GEEKS_MAXFLOW_GRAPH, 0, 5, flows, mf)
 
 
 def test_flow_parallel_edge_correct_guess():
@@ -93,8 +94,8 @@ def test_flow_parallel_edge_correct_guess():
 
     edges, capacities, _ = make_edges_and_capacities(graph)
 
-    mf, _ = max_flow_with_guess(edges, capacities, s=0, t=3, optimal_flow=5)
-    assert mf == 5
+    mf, flows = max_flow_with_guess(edges, capacities, s=0, t=3, optimal_flow=5)
+    assert_valid_solution(graph, 0, 3, flows, mf)
 
 
 IDK_GRAPH = [
@@ -112,16 +113,15 @@ IDK_GRAPH = [
 
 def test_idk_binary_search():
     edges, capacities, _ = make_edges_and_capacities(IDK_GRAPH)
-    mf, _ = max_flow(edges, capacities, s=0, t=5)
-    assert mf == 23
+    mf, flows = max_flow(edges, capacities, s=0, t=5)
+    assert_valid_solution(IDK_GRAPH, 0, 5, flows, mf)
 
 
 def test_idk_correct_guess():
-    graph = IDK_GRAPH
-    edges, capacities, _ = make_edges_and_capacities(graph)
+    edges, capacities, _ = make_edges_and_capacities(IDK_GRAPH)
     # init_flow = np.array([6, 7, 1, 6, 8, 1, 3, 3, 10, 13], dtype=float)
-    mf, _ = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23)
-    assert mf == 23
+    mf, flows = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23)
+    assert_valid_solution(IDK_GRAPH, 0, 5, flows, mf)
 
 
 FLOW_LOWER_UPPER_GRAPH = [
@@ -160,5 +160,5 @@ def test_thore_fractional_graph_correct_guess():
 
     edges, capacities, _ = make_edges_and_capacities(graph)
 
-    mf, _ = max_flow_with_guess(edges, capacities, s=0, t=4, optimal_flow=1)
-    assert mf == 1
+    mf, flows = max_flow_with_guess(edges, capacities, s=0, t=4, optimal_flow=1)
+    assert_valid_solution(graph, 0, 4, flows, mf)
