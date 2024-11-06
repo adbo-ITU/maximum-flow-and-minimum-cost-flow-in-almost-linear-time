@@ -22,8 +22,9 @@ jobs:
         run: make ruff
       - name: Export PATH
         run: |
-          echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
-          alias pyright=basedpyright
+          poetryPath = $(poetry env info --path)/bin
+          echo "$poetryPath" >> $GITHUB_PATH
+          cp $poetryPath/basedpyright $poetryPath/pyright
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
