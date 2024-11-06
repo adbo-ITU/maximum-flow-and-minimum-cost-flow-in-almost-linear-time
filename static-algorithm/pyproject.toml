@@ -3,6 +3,7 @@ name = "static-algorithm"
 version = "0.1.0"
 description = ""
 authors = ["Adrian Borup <adrian@borup.com>", "albe2669 <albert@risenielsen.dk>"]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
