@@ -1,9 +1,9 @@
-from typing import List, Tuple, Union
+from typing import Union
 
 
-Edge = Tuple[int, int]
-EdgeSpec = Union[Tuple[Edge, int], Tuple[Edge, int, int]]
-Graph = List[EdgeSpec]
+Edge = tuple[int, int]
+EdgeSpec = Union[tuple[Edge, int], tuple[Edge, int, int]]
+Graph = list[EdgeSpec]
 
 
 def make_edges_and_capacities(graph: Graph):
