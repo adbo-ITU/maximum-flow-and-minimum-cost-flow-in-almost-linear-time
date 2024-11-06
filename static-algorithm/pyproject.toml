@@ -10,12 +10,11 @@ python = "^3.12"
 numpy = "^2.1.3"
 networkx = "^3.4.2"
 maturin = "^1.7.4"
-basedpyright = "^1.21.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
 ruff = "0.7.2"
-pyright = "^1.1.388"
+basedpyright = "^1.21.0"
 
 [build-system]
 requires = ["poetry-core"]
