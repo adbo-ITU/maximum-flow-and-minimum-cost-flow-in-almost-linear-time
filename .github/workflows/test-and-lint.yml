@@ -9,9 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
-        run: |
-          python -m pip install --upgrade pip
-          pipx install poetry
+        run: pipx install poetry
       - name: Install Python
         uses: actions/setup-python@v5
         with:
@@ -39,9 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
-        run: |
-          python -m pip install --upgrade pip
-          pipx install poetry
+        run: pipx install poetry
       - name: Install Python
         uses: actions/setup-python@v5
         with:
