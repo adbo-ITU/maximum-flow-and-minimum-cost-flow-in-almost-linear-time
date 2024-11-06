@@ -32,7 +32,6 @@ class MinCostFlow:
         self.m = len(edges)
         self.n = len(set(v for e in edges for v in e)) + 1
         self.edges = edges
-        self.c_org = c
         self.u_lower = u_lower
         self.u_upper = u_upper
         self.optimal_cost = optimal_cost
