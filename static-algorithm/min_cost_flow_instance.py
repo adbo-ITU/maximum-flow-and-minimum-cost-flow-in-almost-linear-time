@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Tuple, Optional
 import numpy as np
+import min_ratio as mrlib
 
 
 @dataclass
@@ -18,7 +19,7 @@ class MinCostFlow:
 
     undirected_edge_to_indices: dict[Tuple[int, int], list[int]]
 
-    circulation_cache: Optional[list[np.ndarray]] = None
+    min_ratio_cycle_finder: Optional[mrlib.MinRatioCycleFinder] = None
 
     def __init__(
         self,
