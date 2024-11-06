@@ -22,8 +22,15 @@ jobs:
           poetry check
           poetry install
       - name: Run Ruff
-        run: poetry run ruff check -e --output-format=github .
-      - uses: jakebailey/pyright-action@v2
+        continue-on-error: true
+        run: |
+          poetry run ruff check -e --output-format=github .
+          poetry run ruff format --check --diff  .
+      - name: Export PATH
+        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+      - name: Run Pyright
+        uses: jakebailey/pyright-action@v2
+
   test:
     runs-on: ubuntu-latest
     defaults:
