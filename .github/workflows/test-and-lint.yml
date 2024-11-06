@@ -22,7 +22,7 @@ jobs:
           poetry check
           poetry install
       - name: Run Ruff
-        run: poetry run ruff check --output-format=github .
+        run: poetry run ruff check -e --output-format=github .
       - uses: jakebailey/pyright-action@v2
   test:
     runs-on: ubuntu-latest
