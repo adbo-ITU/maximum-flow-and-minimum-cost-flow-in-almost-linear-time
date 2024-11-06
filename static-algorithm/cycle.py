@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+from custom_types import FloatArrayType
 from min_cost_flow_instance import MinCostFlow
 from typing import Tuple, Set, List
 from itertools import combinations
@@ -8,7 +9,7 @@ import min_ratio as mrlib
 kappa = 10
 
 
-def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
+def find_min_ratio_cycle(I: MinCostFlow, f: FloatArrayType):
     l = I.calc_lengths(f)
     g = I.calc_gradients(f)
 
@@ -23,7 +24,9 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     min_ratio, min_ratio_cycle = I.min_ratio_cycle_finder.find_min_ratio_cycle(gl, ll)
     min_ratio_cycle = np.array(min_ratio_cycle)
 
-    assert min_ratio_cycle is not None and min_ratio < float('inf'), "No min ratio cycle found"
+    assert min_ratio_cycle is not None and min_ratio < float(
+        "inf"
+    ), "No min ratio cycle found"
 
     # assert min_ratio <= -kappa, f"min_ratio is not less than -kappa: {min_ratio}"
 
@@ -40,7 +43,7 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     return (min_ratio, min_ratio_cycle * eta)
 
 
-def get_circulations(I: MinCostFlow, cycles: list[list[int]]) -> list[np.ndarray]:
+def get_circulations(I: MinCostFlow, cycles: list[list[int]]) -> list[FloatArrayType]:
     circulations = []
     for cycle in cycles:
         circulation = np.zeros(I.m, dtype=float)
@@ -89,9 +92,13 @@ def find_all_cycles(I: MinCostFlow):
     return cycles
 
 
-def handle_pair_cycles(I: MinCostFlow, visited_cycles: Set[List[int]], pair_cycles: List[Tuple[List[int], Set[int]]]):
+def handle_pair_cycles(
+    I: MinCostFlow,
+    visited_cycles: Set[List[int]],
+    pair_cycles: List[Tuple[List[int], Set[int]]],
+):
     cycles = []
-    for (cycle, pair_edges) in pair_cycles:
+    for cycle, pair_edges in pair_cycles:
         for amount_to_replace in range(1, len(pair_edges) + 1):
             for edges_to_replace in combinations(pair_edges, amount_to_replace):
                 G = nx.MultiGraph(resolve_edges(I, cycle))
@@ -112,7 +119,8 @@ def handle_pair_cycles(I: MinCostFlow, visited_cycles: Set[List[int]], pair_cycl
             a, b = I.edges[edge]
 
             check_if_visited(
-                I.undirected_edge_to_indices[(a, b)], visited_cycles, cycles)
+                I.undirected_edge_to_indices[(a, b)], visited_cycles, cycles
+            )
     return cycles
 
 
