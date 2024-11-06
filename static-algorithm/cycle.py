@@ -15,14 +15,12 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     gl = list(g)
     ll = list(l)
 
-    if I.circulation_cache is None:
+    if I.min_ratio_cycle_finder is None:
         cycles = find_all_cycles(I)
         circulations = get_circulations(I, cycles)
-        I.circulation_cache = circulations
-    else:
-        circulations = I.circulation_cache
+        I.min_ratio_cycle_finder = mrlib.MinRatioCycleFinder(circulations)
 
-    min_ratio, min_ratio_cycle = mrlib.find_min_ratio_cycle(circulations, gl, ll)
+    min_ratio, min_ratio_cycle = I.min_ratio_cycle_finder.find_min_ratio_cycle(gl, ll)
     min_ratio_cycle = np.array(min_ratio_cycle)
 
     assert min_ratio_cycle is not None and min_ratio < float('inf'), "No min ratio cycle found"
