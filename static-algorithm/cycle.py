@@ -1,9 +1,9 @@
 import networkx as nx
 import numpy as np
-import numpy.linalg as LA
 from min_cost_flow_instance import MinCostFlow
 from typing import Tuple, Set, List
 from itertools import combinations
+import min_ratio as mrlib
 
 kappa = 10
 
@@ -11,10 +11,9 @@ kappa = 10
 def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     l = I.calc_lengths(f)
     g = I.calc_gradients(f)
-    L = np.diagflat(l)
 
-    min_ratio = float('inf')
-    min_ratio_cycle = None
+    gl = list(g)
+    ll = list(l)
 
     if I.circulation_cache is None:
         cycles = find_all_cycles(I)
@@ -23,21 +22,10 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
     else:
         circulations = I.circulation_cache
 
-    # TODO: handle parallel edges - they are not returned as multiple cycles
-    for circulation in circulations:
-        for dir in [1, -1]:
-            delta = dir * circulation
+    min_ratio, min_ratio_cycle = mrlib.find_min_ratio_cycle(circulations, gl, ll)
+    min_ratio_cycle = np.array(min_ratio_cycle)
 
-            gd = g.dot(delta)
-            Lxd = L @ delta
-            norm = LA.norm(Lxd, 1)
-            ratio = gd / norm
-
-            if ratio < min_ratio:
-                min_ratio = ratio
-                min_ratio_cycle = circulation
-
-    assert min_ratio_cycle is not None, "No min ratio cycle found"
+    assert min_ratio_cycle is not None and min_ratio < float('inf'), "No min ratio cycle found"
 
     # assert min_ratio <= -kappa, f"min_ratio is not less than -kappa: {min_ratio}"
 
