@@ -27,7 +27,7 @@ jobs:
           poetry run ruff check -e --output-format=github .
           poetry run ruff format --check --diff  .
       - name: Export PATH
-        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+        run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
 
