@@ -4,23 +4,73 @@ import numpy.linalg as LA
 from min_cost_flow_instance import MinCostFlow
 from typing import Tuple, Set, List
 from itertools import combinations
+import multiprocessing
+from utils import chunk_into_n
+import time
 
 kappa = 10
 
 
 def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
+    num_procs = 3
+
+    start_time = time.time()
+
+    if I.cycle_cache is None or I.chunked_cycle_cache is None:
+        cycles = find_all_cycles(I)
+        chunked_cycles = chunk_into_n(cycles, num_procs)
+        I.cycle_cache = cycles
+        I.chunked_cycle_cache = chunked_cycles
+    else:
+        cycles = I.cycle_cache
+        chunked_cycles = I.chunked_cycle_cache
+
+    if len(cycles) < 200_000:
+        result_queue = multiprocessing.Queue()
+        min_ratio_cycle_worker(I, f, cycles, result_queue)
+        min_ratio, min_ratio_cycle = result_queue.get()
+    else:
+        manager = multiprocessing.Manager()
+        result_queue = manager.Queue()
+
+        procs = []
+        for i in range(num_procs):
+            proc = multiprocessing.Process(target=min_ratio_cycle_worker, args=(I, f, chunked_cycles[i], result_queue))
+            procs.append(proc)
+            proc.start()
+        for proc in procs:
+            proc.join()
+
+        min_ratio, min_ratio_cycle = min([result_queue.get() for _ in procs], key=lambda x: x[0])
+
+    end_time = time.time()
+    print("Time taken to calculate min ratio cycle:", f"{end_time - start_time:.3f}", "seconds")
+
+    assert min_ratio_cycle is not None, "No min ratio cycle found"
+
+    # assert min_ratio <= -kappa, f"min_ratio is not less than -kappa: {min_ratio}"
+
+    g = I.calc_gradients(f)
+    # TODO: I don't know how I made this work, but I did. I'm not sure how good it is.
+    # For example, eta can now be negative, which essentially flips the circulation..
+    # Do we want that? Is it correct? If I understand the paper correctly, eta is always >0.
+    # But Φ(f) explodes if I do the absolute value.
+    gd = g.dot(min_ratio_cycle)
+    print("gd =", gd)
+    # TODO: Scale the circulation according to Theorem 4.3, step 2
+    eta = -kappa / gd
+    print("eta =", eta)
+
+    return (min_ratio, min_ratio_cycle * eta)
+
+
+def min_ratio_cycle_worker(I: MinCostFlow, f: np.ndarray, cycles, result_queue: multiprocessing.Queue):
     l = I.calc_lengths(f)
     g = I.calc_gradients(f)
-    L = np.diagflat(l)
+    # L = np.diagflat(l)
 
     min_ratio = float('inf')
     min_ratio_cycle = None
-
-    if I.cycle_cache is None:
-        cycles = find_all_cycles(I)
-        I.cycle_cache = cycles
-    else:
-        cycles = I.cycle_cache
 
     # TODO: handle parallel edges - they are not returned as multiple cycles
     for cycle in cycles:
@@ -38,7 +88,8 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
             delta = dir * circulation
 
             gd = g.dot(delta)
-            Lxd = L @ delta
+            # Lxd = L @ delta
+            Lxd = l * delta # should be the same, slightly faster maybe
             norm = LA.norm(Lxd, 1)
             ratio = gd / norm
 
@@ -46,21 +97,7 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
                 min_ratio = ratio
                 min_ratio_cycle = circulation
 
-    assert min_ratio_cycle is not None, "No min ratio cycle found"
-
-    # assert min_ratio <= -kappa, f"min_ratio is not less than -kappa: {min_ratio}"
-
-    # TODO: I don't know how I made this work, but I did. I'm not sure how good it is.
-    # For example, eta can now be negative, which essentially flips the circulation..
-    # Do we want that? Is it correct? If I understand the paper correctly, eta is always >0.
-    # But Φ(f) explodes if I do the absolute value.
-    gd = g.dot(min_ratio_cycle)
-    print("gd =", gd)
-    # TODO: Scale the circulation according to Theorem 4.3, step 2
-    eta = -kappa / gd
-    print("eta =", eta)
-
-    return (min_ratio, min_ratio_cycle * eta)
+    result_queue.put((min_ratio, min_ratio_cycle))
 
 
 def find_all_cycles(I: MinCostFlow):

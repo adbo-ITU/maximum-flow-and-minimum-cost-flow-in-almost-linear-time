@@ -19,6 +19,7 @@ class MinCostFlow:
     undirected_edge_to_indices: dict[Tuple[int, int], list[int]]
 
     cycle_cache: Optional[list[list[int]]] = None
+    chunked_cycle_cache: Optional[list[list[list[int]]]] = None
 
     def __init__(
         self,
