@@ -17,6 +17,7 @@ def find_min_ratio_cycle(I: MinCostFlow, f: np.ndarray):
 
     if I.min_ratio_cycle_finder is None:
         cycles = find_all_cycles(I)
+        print(f"Found {len(cycles)} cycles")
         circulations = get_circulations(I, cycles)
         I.min_ratio_cycle_finder = mrlib.MinRatioCycleFinder(circulations)
 

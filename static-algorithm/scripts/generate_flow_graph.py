@@ -26,12 +26,12 @@ class Graph:
 
 def get_random_source_sink_graph():
     MIN_PER_RANK = 2    # Nodes/Rank: How 'fat' the DAG should be
-    MAX_PER_RANK = 10
-    MIN_RANKS = 10   # Ranks: How 'tall' the DAG should be
-    MAX_RANKS = 10
-    PERCENT = 0.4  # Chance of having an Edge
+    MAX_PER_RANK = 5
+    MIN_RANKS = 6   # Ranks: How 'tall' the DAG should be
+    MAX_RANKS = 7
+    PERCENT = 0.6  # Chance of having an Edge
     MIN_WEIGHT = 1
-    MAX_WEIGHT = 100
+    MAX_WEIGHT = 50
 
     source = 0
     nodes = 1
