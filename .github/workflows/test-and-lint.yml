@@ -16,14 +16,10 @@ jobs:
           cache: 'poetry'
           python-version: '3.12'
       - name: Install dependencies
-        run: |
-          poetry check
-          poetry install
+        run: make install
       - name: Run Ruff
         continue-on-error: true
-        run: |
-          poetry run ruff check -e --output-format=github .
-          poetry run ruff format --check --diff  .
+        run: make ruff
       - name: Export PATH
         run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
       - name: Run Pyright
@@ -44,7 +40,6 @@ jobs:
           cache: 'poetry'
           python-version: '3.12'
       - name: Install dependencies
-        run: |
-          poetry install
+        run: make install
       - name: Run tests
-        run: poetry run pytest
+        run: make test
