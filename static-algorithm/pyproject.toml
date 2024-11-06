@@ -3,11 +3,13 @@ name = "static-algorithm"
 version = "0.1.0"
 description = ""
 authors = ["Adrian Borup <adrian@borup.com>", "albe2669 <albert@risenielsen.dk>"]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
 numpy = "^2.1.3"
 networkx = "^3.4.2"
+maturin = "^1.7.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
