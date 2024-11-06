@@ -1,8 +1,5 @@
-from typing import Union
-
-
 Edge = tuple[int, int]
-EdgeSpec = Union[tuple[Edge, int], tuple[Edge, int, int]]
+EdgeSpec = tuple[Edge, int] | tuple[Edge, int, int]
 Graph = list[EdgeSpec]
 
 
