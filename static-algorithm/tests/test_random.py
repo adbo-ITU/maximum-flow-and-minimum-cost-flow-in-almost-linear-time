@@ -1,15 +1,16 @@
 from main import max_flow_with_guess
 from tests.find_max_flow import find_max_flow
 from tests.utils import make_edges_and_capacities
+from tests.verifier import assert_valid_solution
 import pytest
 
 
 @pytest.mark.slow
 def test_flow_random_dag():
-    edges, s, t = parse_input(INPUT)
-    edges, capacities, _ = make_edges_and_capacities(edges)
-    mf, _ = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=184)
-    assert mf == 184
+    graph, s, t = parse_input(INPUT)
+    edges, capacities, _ = make_edges_and_capacities(graph)
+    mf, flows = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=184)
+    assert_valid_solution(graph, s, t, flows, mf)
 
 
 def test_rikos_code():
