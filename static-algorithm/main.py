@@ -1,13 +1,27 @@
 from typing import Tuple
 from cycle import find_min_ratio_cycle
+from howard import Howard
 from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
 import numpy as np
 
 
-def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, optimal_flow: int, lower_capacities: list[int] = None):
+def max_flow_with_guess(
+    edges: list[Tuple[int, int]],
+    capacities: list[int],
+    s: int,
+    t: int,
+    optimal_flow: int,
+    lower_capacities: list[int] = None,
+):
     I = MinCostFlow.from_max_flow_instance(
-        edges=edges, s=s, t=t, optimal_flow=optimal_flow, capacities=capacities, lower_capacities=lower_capacities)
+        edges=edges,
+        s=s,
+        t=t,
+        optimal_flow=optimal_flow,
+        capacities=capacities,
+        lower_capacities=lower_capacities,
+    )
 
     print("Initial instance:")
     print(I)
@@ -26,7 +40,6 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     I.print_B()
     print()
 
-
     # TODO: Understand why the paper's threshold is too small
     # threshold = float(I.m * I.U) ** (-10)
     threshold = 1e-5
@@ -39,21 +52,28 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
         print("Iteration", i)
         print("Φ(f) =", cur_phi)
 
-        assert np.max(np.abs(I.B.T @ cur_flow)) < 1e-10, "Flow conservation has been broken"
+        assert (
+            np.max(np.abs(I.B.T @ cur_flow)) < 1e-10
+        ), "Flow conservation has been broken"
 
         min_ratio, min_ratio_cycle = find_min_ratio_cycle(I, cur_flow)
+        how_min_ratio, how_cycle = Howard(I, cur_flow).min_ratio_cycle()
+        print("how_cycle_min_ratio =", how_min_ratio)
+        print("how_cycle =", how_cycle)
 
         cur_flow += min_ratio_cycle
 
-        print("min_ratio =", min_ratio)
+        print("min_cycle_ratio =", min_ratio)
         print("min_ratio_cycle =", min_ratio_cycle)
-        print("  -> edges:", [I.edges[e]
-              for e, c in enumerate(min_ratio_cycle) if c != 0])
+        print(
+            "  -> cycle_edges:",
+            [I.edges[e] for e, c in enumerate(min_ratio_cycle) if c != 0],
+        )
         print(f"flow ({cur_flow[flow_idx]}): ", cur_flow)
         print("original flow:", cur_flow[:original_m])
 
         new_phi = I.phi(cur_flow)
-        if not new_phi < float('inf'):
+        if not new_phi < float("inf"):
             print("Φ(f) has exploded")
             break
         # assert new_phi < float('inf'), "Φ(f) has exploded"
@@ -68,16 +88,27 @@ def max_flow_with_guess(edges: list[Tuple[int, int]], capacities: list[int], s: 
     return round(cur_flow[flow_idx]), np.round(cur_flow[:flow_idx])
 
 
-def max_flow(edges: list[Tuple[int, int]], capacities: list[int], s: int, t: int, lower_capacities: list[int] = None):
-    max_possible_flow = sum(capacities[e]
-                            for e, (u, _) in enumerate(edges) if u == s)
+def max_flow(
+    edges: list[Tuple[int, int]],
+    capacities: list[int],
+    s: int,
+    t: int,
+    lower_capacities: list[int] = None,
+):
+    max_possible_flow = sum(capacities[e] for e, (u, _) in enumerate(edges) if u == s)
 
-    low, high = 0, max_possible_flow+1
+    low, high = 0, max_possible_flow + 1
     mf, flows = None, None
     while low < high:
         mid = (low + high) // 2
         mf, flows = max_flow_with_guess(
-            edges, capacities, s=s, t=t, optimal_flow=mid, lower_capacities=lower_capacities)
+            edges,
+            capacities,
+            s=s,
+            t=t,
+            optimal_flow=mid,
+            lower_capacities=lower_capacities,
+        )
 
         if mf < mid:
             high = mid
