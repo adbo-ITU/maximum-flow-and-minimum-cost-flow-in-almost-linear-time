@@ -29,6 +29,7 @@ def test_flow_random_dag_134_edges():
     assert_valid_solution(graph, s, t, flows, mf)
 
 
+@pytest.mark.slow
 def test_flow_random_dag_517_edges():
     graph, s, t = parse_input(INPUT_517_EDGES)
     edges, capacities, _ = make_edges_and_capacities(graph)
