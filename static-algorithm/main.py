@@ -1,6 +1,5 @@
 from typing import Tuple
-from cycle import find_min_ratio_cycle
-from howard import Howard
+from howard import minimum_cycle_ratio
 from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
 import numpy as np
@@ -56,10 +55,7 @@ def max_flow_with_guess(
             np.max(np.abs(I.B.T @ cur_flow)) < 1e-10
         ), "Flow conservation has been broken"
 
-        min_ratio, min_ratio_cycle = find_min_ratio_cycle(I, cur_flow)
-        how_min_ratio, how_cycle = Howard(I, cur_flow).min_ratio_cycle()
-        print("how_cycle_min_ratio =", how_min_ratio)
-        print("how_cycle =", how_cycle)
+        min_ratio, min_ratio_cycle = minimum_cycle_ratio(I, cur_flow)
 
         cur_flow += min_ratio_cycle
 

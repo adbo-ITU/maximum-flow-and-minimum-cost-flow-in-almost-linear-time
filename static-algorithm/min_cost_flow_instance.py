@@ -18,7 +18,7 @@ class MinCostFlow:
     B: np.ndarray
 
     undirected_edge_to_indices: dict[Tuple[int, int], list[int]]
-    edge_endpoints: dict[int, list[int]]
+    adj: list[list[int]]
 
     min_ratio_cycle_finder: Optional[mrlib.MinRatioCycleFinder] = None
 
@@ -68,14 +68,10 @@ class MinCostFlow:
             self.undirected_edge_to_indices[(a, b)].append(e)
             self.undirected_edge_to_indices[(b, a)].append(e)
 
-        self.edge_endpoints = {}
+        self.adj = [[] for _ in range(self.n)]
         for e, (a, b) in enumerate(edges):
-            if a not in self.edge_endpoints:
-                self.edge_endpoints[a] = []
-            if b not in self.edge_endpoints:
-                self.edge_endpoints[b] = []
-            self.edge_endpoints[a].append(e)
-            self.edge_endpoints[b].append(e)
+            self.adj[a].append(e)
+            self.adj[b].append(e)
 
     def print_B(self):
         print(f"{'vertices:': >10} ", " ".join([f"{i: >2}" for i in range(self.n)]))
@@ -162,12 +158,9 @@ class MinCostFlow:
         self.undirected_edge_to_indices[(a, b)].append(len(self.edges) - 1)
         self.undirected_edge_to_indices[(b, a)].append(len(self.edges) - 1)
 
-        if a not in self.edge_endpoints:
-            self.edge_endpoints[a] = []
-        if b not in self.edge_endpoints:
-            self.edge_endpoints[b] = []
-        self.edge_endpoints[a].append(len(self.edges) - 1)
-        self.edge_endpoints[b].append(len(self.edges) - 1)
+        self.adj.append([])
+        self.adj[a].append(len(self.edges) - 1)
+        self.adj[b].append(len(self.edges) - 1)
 
         self.m += 1
         self.c = np.append(self.c, c)
