@@ -2,9 +2,6 @@ update:
 	poetry update
 	poetry install
 
-build:
-	cd min_ratio && poetry -C ../ run maturin develop --release
-
 install:
 	poetry check
 	poetry install
@@ -15,10 +12,8 @@ ruff:
 
 
 test:
-	$(MAKE) build
 	poetry run pytest
 
 run:
-	$(MAKE) build
 	poetry run python3 main.py
 
