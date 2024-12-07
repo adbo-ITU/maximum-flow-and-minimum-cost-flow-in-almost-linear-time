@@ -236,7 +236,7 @@ class Howard:
 
 def minimum_cycle_ratio(
     g: MinCostFlow, f: NDArray[np.float64]
-) -> tuple[float, list[int], NDArray[np.float64]]:
+) -> tuple[float, NDArray[np.float64]]:
     """Find minimum cycle ratio in graph"""
     howard = Howard(g, f)
     return howard.find_optimum_cycle_ratio()
