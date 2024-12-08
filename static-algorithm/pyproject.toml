@@ -5,6 +5,11 @@ description = ""
 authors = ["Adrian Borup <adrian@borup.com>", "albe2669 <albert@risenielsen.dk>"]
 package-mode = false
 
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
 [tool.poetry.dependencies]
 python = "^3.12"
 numpy = "^2.1.3"

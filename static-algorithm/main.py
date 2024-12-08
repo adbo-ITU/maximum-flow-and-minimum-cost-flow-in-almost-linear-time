@@ -45,7 +45,8 @@ def max_flow_with_guess(
     threshold = 1e-5
     log("Threshold:", threshold)
 
-    kappa = 10
+    kappa = 0.9999
+    upscale = 500
 
     i = 0
     cur_phi = I.phi(cur_flow)
@@ -64,8 +65,8 @@ def max_flow_with_guess(
         min_ratio, min_ratio_cycle = minimum_cycle_ratio(I, gradients, lengths)
         count_edge_updates(min_ratio_cycle)
 
-        eta: float = -kappa / gradients.dot(min_ratio_cycle)
-        augment_cycle = min_ratio_cycle * eta
+        eta = -kappa**2 / (50 * gradients.dot(min_ratio_cycle))
+        augment_cycle = min_ratio_cycle * (eta * upscale)
 
         cur_flow += augment_cycle
 

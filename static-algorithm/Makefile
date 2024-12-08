@@ -14,6 +14,9 @@ ruff:
 test:
 	poetry run pytest
 
+test-not-slow:
+	poetry run pytest -m "not slow"
+
 run:
 	poetry run python3 main.py
 
