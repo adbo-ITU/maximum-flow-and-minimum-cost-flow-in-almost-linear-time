@@ -3,7 +3,7 @@ from howard import minimum_cycle_ratio
 from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
 import numpy as np
-from utils import log
+from utils import count_edge_updates, log, print_edge_updates
 
 
 def max_flow_with_guess(
@@ -62,6 +62,7 @@ def max_flow_with_guess(
         lengths = I.calc_lengths(cur_flow)
 
         min_ratio, min_ratio_cycle = minimum_cycle_ratio(I, gradients, lengths)
+        count_edge_updates(min_ratio_cycle)
 
         eta: float = -kappa / gradients.dot(min_ratio_cycle)
         augment_cycle = min_ratio_cycle * eta
@@ -88,6 +89,7 @@ def max_flow_with_guess(
 
         log()
 
+    print_edge_updates()
     log("rounded flow:", np.round(cur_flow[:original_m]))
 
     return round(cur_flow[flow_idx]), np.round(cur_flow[:flow_idx])
@@ -120,6 +122,7 @@ def max_flow(
         else:
             low = mid + 1
 
+    print_edge_updates()
     # TODO: fix this, I'm pretty sure this can be off by one
     return mf, flows
 
