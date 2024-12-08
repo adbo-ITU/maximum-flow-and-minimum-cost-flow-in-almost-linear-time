@@ -1,6 +1,8 @@
+import pytest
 from main import max_flow, max_flow_with_guess
 from tests.utils import make_edges_and_capacities
 from tests.verifier import assert_valid_solution
+import utils
 
 
 # https://cp-algorithms.com/graph/edmonds_karp.html
@@ -15,6 +17,13 @@ CP_ALGORITHMS_GRAPH = [
     ((3, 5), 8),
     ((4, 5), 5),
 ]
+
+
+@pytest.fixture(autouse=True)
+def reset_count():
+    utils.reset_edge_updates()
+    yield  # allows us to have cleanup after the test
+    utils.reset_edge_updates()
 
 
 def test_flow_sample_from_cp_algorithms_binary_search():
@@ -71,15 +80,13 @@ GEEKS_FOR_GEEKS_MAXFLOW_GRAPH = [
 
 
 def test_flow_sample_from_geeksforgeeks_binary_search():
-    edges, capacities, _ = make_edges_and_capacities(
-        GEEKS_FOR_GEEKS_MAXFLOW_GRAPH)
+    edges, capacities, _ = make_edges_and_capacities(GEEKS_FOR_GEEKS_MAXFLOW_GRAPH)
     mf, flows = max_flow(edges, capacities, s=0, t=5)
     assert_valid_solution(GEEKS_FOR_GEEKS_MAXFLOW_GRAPH, 0, 5, flows, mf)
 
 
 def test_flow_sample_from_geeksforgeeks_correct_guess():
-    edges, capacities, _ = make_edges_and_capacities(
-        GEEKS_FOR_GEEKS_MAXFLOW_GRAPH)
+    edges, capacities, _ = make_edges_and_capacities(GEEKS_FOR_GEEKS_MAXFLOW_GRAPH)
     mf, flows = max_flow_with_guess(edges, capacities, s=0, t=5, optimal_flow=23)
     assert_valid_solution(GEEKS_FOR_GEEKS_MAXFLOW_GRAPH, 0, 5, flows, mf)
 
@@ -138,14 +145,20 @@ FLOW_LOWER_UPPER_GRAPH = [
 
 
 def test_flow_lower_and_upper_binary_search():
-    edges, capacities, lower_capacities = make_edges_and_capacities(FLOW_LOWER_UPPER_GRAPH)
+    edges, capacities, lower_capacities = make_edges_and_capacities(
+        FLOW_LOWER_UPPER_GRAPH
+    )
     mf, _ = max_flow(edges, capacities, s=0, t=5, lower_capacities=lower_capacities)
     assert mf == 15
 
 
 def test_flow_lower_and_upper_correct_guess():
-    edges, capacities, lower_capacities = make_edges_and_capacities(FLOW_LOWER_UPPER_GRAPH)
-    mf, _ = max_flow_with_guess(edges, capacities, s=0, t=5, lower_capacities=lower_capacities, optimal_flow=15)
+    edges, capacities, lower_capacities = make_edges_and_capacities(
+        FLOW_LOWER_UPPER_GRAPH
+    )
+    mf, _ = max_flow_with_guess(
+        edges, capacities, s=0, t=5, lower_capacities=lower_capacities, optimal_flow=15
+    )
     assert mf == 15
 
 

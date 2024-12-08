@@ -1,5 +1,6 @@
 from collections import defaultdict, deque
 from tests.utils import Edge
+import utils
 
 # all credit to Riko Jacob for this code
 
@@ -17,8 +18,8 @@ def find_max_flow(edges: list[Edge], capacities: list[int], s: int, t: int):
         for v, c in d.items():
             flow_edges.append((u, v, c))
 
-    print(f"Max flow: {max_flow}")
-    print("Flow edges:", flow_edges)
+    print(f"[CAPACITY] Max flow: {max_flow}")
+    print("[CAPACITY] Flow edges:", flow_edges)
 
     return max_flow, flow_edges
 
@@ -45,6 +46,7 @@ def bfs(graph, src, dest, mincap=0):  # returns path to dest
 
 
 def flow(orggraph, src, dest):
+    edge_updates: list[int] = []
     graph = defaultdict(lambda: defaultdict(int))
     maxcapacity = 0
     for u, d in orggraph.items():
@@ -61,6 +63,16 @@ def flow(orggraph, src, dest):
                 mincap = mincap // 2
                 continue
             else:
+                if utils.ENABLE_EDGE_COUNT:
+                    if utils.ENABLE_ALL_EDGE_COUNT:
+                        print("[CAPACITY] Edge updates:", edge_updates)
+                    print("[CAPACITY] Total edge updates:", sum(edge_updates))
+                    print("[CAPACITY] Max edge updates:", max(edge_updates))
+                    print("[CAPACITY] Min edge updates:", min(edge_updates))
+                    print(
+                        "[CAPACITY] Average edge updates:",
+                        sum(edge_updates) / len(edge_updates),
+                    )
                 return (
                     current_flow,
                     {
@@ -75,9 +87,14 @@ def flow(orggraph, src, dest):
         #     assert(p[i][0] == p[i+1][1])
         # print(current_flow,saturation,file=sys.stderr)#,[f"{u[0]}-{u[1]}:{inp[u[0]][u[1]]}:{graph[u][v]}" for u,v in p if u[2]==0])
         current_flow += saturation
+        edge_update = 0
         for u, v in p:
+            edge_update += 2
             graph[u][v] -= saturation
             graph[v][u] += saturation
+
+        if utils.ENABLE_EDGE_COUNT:
+            edge_updates.append(edge_update)
 
 
 def retain_only_active_edges(original_graph, graph):

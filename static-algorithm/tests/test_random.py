@@ -4,6 +4,15 @@ from tests.utils import make_edges_and_capacities
 from tests.verifier import assert_valid_solution
 import pytest
 
+import utils
+
+
+@pytest.fixture(autouse=True)
+def reset_count():
+    utils.reset_edge_updates()
+    yield  # allows us to have cleanup after the test
+    utils.reset_edge_updates()
+
 
 @pytest.mark.slow
 def test_flow_random_dag_184():

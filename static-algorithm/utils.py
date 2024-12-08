@@ -28,8 +28,8 @@ def count_edge_updates(cycle: NDArray[float64]):
 def print_edge_updates():
     if ENABLE_EDGE_COUNT:
         if ENABLE_ALL_EDGE_COUNT:
-            print("Edge updates:", EDGE_UPDATES)
-        print("Total edge updates:", sum(EDGE_UPDATES))
-        print("Max edge updates:", max(EDGE_UPDATES))
-        print("Min edge updates:", min(EDGE_UPDATES))
-        print("Average edge updates:", sum(EDGE_UPDATES) / len(EDGE_UPDATES))
+            print("[CHEN] Edge updates:", EDGE_UPDATES)
+        print("[CHEN] Total edge updates:", sum(EDGE_UPDATES))
+        print("[CHEN] Max edge updates:", max(EDGE_UPDATES))
+        print("[CHEN] Min edge updates:", min(EDGE_UPDATES))
+        print("[CHEN] Average edge updates:", sum(EDGE_UPDATES) / len(EDGE_UPDATES))
