@@ -74,6 +74,7 @@ class MaxFlow:
                 self.edge_updates.append(edge_updates)
 
         if utils.ENABLE_EDGE_COUNT:
+            print("[EDMOND BFS] Flow:", flow)
             if utils.ENABLE_ALL_EDGE_COUNT:
                 print("[EDMOND BFS] Edge updates:", self.edge_updates)
             print("[EDMOND BFS] Total edge updates:", sum(self.edge_updates))
