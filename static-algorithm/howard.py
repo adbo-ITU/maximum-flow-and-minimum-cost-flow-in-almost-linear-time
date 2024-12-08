@@ -1,14 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
-from enum import Enum
 
 from min_cost_flow_instance import MinCostFlow
-
-
-class Color(Enum):
-    WHITE = 0
-    BLACK = 1
-
 
 INF = float("inf")
 EPS = -0.005
@@ -21,7 +14,6 @@ class Howard:
     V: int
     distances: list[float]
     policy: list[int]
-    colors: list[Color]
     bad_vertices: list[bool]  # Vertices with no outgoing edges.
     in_edges_list: list[list[int]]
 
@@ -35,13 +27,17 @@ class Howard:
     gradients: NDArray[np.float64]
     lengths: NDArray[np.float64]
 
-    def __init__(self, graph: MinCostFlow, gradients: NDArray[np.float64], lengths: NDArray[np.float64]):
+    def __init__(
+        self,
+        graph: MinCostFlow,
+        gradients: NDArray[np.float64],
+        lengths: NDArray[np.float64],
+    ):
         self.g = graph
 
         self.V = graph.n
         self.distances = [0.0] * self.V
         self.policy = [-1] * self.V  # Current edge choice for each vertex
-        self.colors = [Color.WHITE] * self.V
         self.bad_vertices = [False] * self.V
 
         self.gradients = gradients
@@ -193,11 +189,10 @@ class Howard:
             ratio = float("inf")
 
             for v in range(self.V):
-                if self.colors[v] == Color.WHITE:
-                    cycle_vertex = self._find_cycle_vertex(v)
-                    curr_ratio = self._compute_cycle_ratio(cycle_vertex)
-                    if ratio > curr_ratio:
-                        ratio = curr_ratio
+                cycle_vertex = self._find_cycle_vertex(v)
+                curr_ratio = self._compute_cycle_ratio(cycle_vertex)
+                if ratio > curr_ratio:
+                    ratio = curr_ratio
 
             # Try to improve policy
             if not self._improve_policy(ratio):
