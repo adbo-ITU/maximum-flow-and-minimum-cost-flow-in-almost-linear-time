@@ -55,7 +55,7 @@ class Howard:
 
     def _compute_bound(self) -> float:
         """Compute bound for cycle ratio"""
-        closest_to_zero = float("inf")
+        closest_to_zero = INF
         sum_weights = 0.0
 
         for i in range(self.g.m):
@@ -182,11 +182,11 @@ class Howard:
         self._construct_policy_graph()
 
         iteration = 0
-        ratio = float("inf")
+        ratio = INF
 
         while iteration < 100:  # Limit iterations to avoid infinite loops
             # Find current ratio
-            ratio = float("inf")
+            ratio = INF
 
             for v in range(self.V):
                 cycle_vertex = self._find_cycle_vertex(v)
@@ -201,7 +201,7 @@ class Howard:
             iteration += 1
 
         if ratio > self.bound - 1e-10 or self.critical_cycle is None:
-            return float("inf"), [], np.zeros(self.g.m, dtype=np.float64)
+            return INF, np.zeros(self.g.m, dtype=np.float64)
         else:
             return ratio, self._numpy_cycle()
 
