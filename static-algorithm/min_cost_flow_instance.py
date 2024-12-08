@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Tuple, Optional
 import numpy as np
 import min_ratio as mrlib
+from utils import log
 
 
 @dataclass
@@ -74,9 +75,9 @@ class MinCostFlow:
             self.adj[b].append(e)
 
     def print_B(self):
-        print(f"{'vertices:': >10} ", " ".join([f"{i: >2}" for i in range(self.n)]))
+        log(f"{'vertices:': >10} ", " ".join([f"{i: >2}" for i in range(self.n)]))
         for e, row in enumerate(self.B):
-            print(f"{e: <2} {str(self.edges[e]): <7}", row)
+            log(f"{e: <2} {str(self.edges[e]): <7}", row)
 
     @staticmethod
     def from_max_flow_instance(

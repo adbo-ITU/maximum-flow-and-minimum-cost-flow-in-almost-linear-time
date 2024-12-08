@@ -3,6 +3,7 @@ from howard import minimum_cycle_ratio
 from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
 import numpy as np
+from utils import log
 
 
 def max_flow_with_guess(
@@ -22,34 +23,34 @@ def max_flow_with_guess(
         lower_capacities=lower_capacities,
     )
 
-    print("Initial instance:")
-    print(I)
-    print()
+    log("Initial instance:")
+    log(I)
+    log()
     I.print_B()
-    print()
+    log()
 
     original_m = I.m
     flow_idx = original_m - 1
     I, cur_flow = calc_feasible_flow(I)
 
-    print("Feasible flow instance:")
-    print(I)
-    print("initial_flow:", cur_flow)
-    print()
+    log("Feasible flow instance:")
+    log(I)
+    log("initial_flow:", cur_flow)
+    log()
     I.print_B()
-    print()
+    log()
 
     # TODO: Understand why the paper's threshold is too small
     # threshold = float(I.m * I.U) ** (-10)
     threshold = 1e-5
-    print("Threshold:", threshold)
+    log("Threshold:", threshold)
 
     i = 0
     cur_phi = I.phi(cur_flow)
     while I.c.dot(cur_flow) - I.optimal_cost >= threshold:
         i += 1
-        print("Iteration", i)
-        print("Φ(f) =", cur_phi)
+        log("Iteration", i)
+        log("Φ(f) =", cur_phi)
 
         assert (
             np.max(np.abs(I.B.T @ cur_flow)) < 1e-10
@@ -59,27 +60,27 @@ def max_flow_with_guess(
 
         cur_flow += min_ratio_cycle
 
-        print("min_cycle_ratio =", min_ratio)
-        print("min_ratio_cycle =", min_ratio_cycle)
-        print(
+        log("min_cycle_ratio =", min_ratio)
+        log("min_ratio_cycle =", augment_cycle)
+        log(
             "  -> cycle_edges:",
             [I.edges[e] for e, c in enumerate(min_ratio_cycle) if c != 0],
         )
-        print(f"flow ({cur_flow[flow_idx]}): ", cur_flow)
-        print("original flow:", cur_flow[:original_m])
+        log(f"flow ({cur_flow[flow_idx]}): ", cur_flow)
+        log("original flow:", cur_flow[:original_m])
 
         new_phi = I.phi(cur_flow)
         if not new_phi < float("inf"):
-            print("Φ(f) has exploded")
+            log("Φ(f) has exploded")
             break
         # assert new_phi < float('inf'), "Φ(f) has exploded"
         # TODO: Understand why we don't always decrease Φ(f). Sign of gradient? Too large step?
         # assert new_phi < cur_phi, "Φ(f) has not decreased"
         cur_phi = new_phi
 
-        print()
+        log()
 
-    print("rounded flow:", np.round(cur_flow[:original_m]))
+    log("rounded flow:", np.round(cur_flow[:original_m]))
 
     return round(cur_flow[flow_idx]), np.round(cur_flow[:flow_idx])
 

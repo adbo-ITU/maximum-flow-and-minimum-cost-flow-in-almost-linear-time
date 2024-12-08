@@ -10,7 +10,7 @@ class Graph:
         e = (x, y)
         try:
             self.edges.remove(e)
-            # print("Removed edge %s" % str(e))
+            # log("Removed edge %s" % str(e))
             self.removed_edges.append(e)
         except:
             return
