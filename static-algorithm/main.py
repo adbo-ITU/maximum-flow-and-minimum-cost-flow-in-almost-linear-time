@@ -45,6 +45,8 @@ def max_flow_with_guess(
     threshold = 1e-5
     log("Threshold:", threshold)
 
+    kappa = 10
+
     i = 0
     cur_phi = I.phi(cur_flow)
     while I.c.dot(cur_flow) - I.optimal_cost >= threshold:
@@ -56,9 +58,15 @@ def max_flow_with_guess(
             np.max(np.abs(I.B.T @ cur_flow)) < 1e-10
         ), "Flow conservation has been broken"
 
-        min_ratio, min_ratio_cycle = minimum_cycle_ratio(I, cur_flow)
+        gradients = I.calc_gradients(cur_flow)
+        lengths = I.calc_lengths(cur_flow)
 
-        cur_flow += min_ratio_cycle
+        min_ratio, min_ratio_cycle = minimum_cycle_ratio(I, gradients, lengths)
+
+        eta: float = -kappa / gradients.dot(min_ratio_cycle)
+        augment_cycle = min_ratio_cycle * eta
+
+        cur_flow += augment_cycle
 
         log("min_cycle_ratio =", min_ratio)
         log("min_ratio_cycle =", augment_cycle)

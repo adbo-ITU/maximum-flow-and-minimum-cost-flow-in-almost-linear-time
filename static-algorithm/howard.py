@@ -4,8 +4,6 @@ from enum import Enum
 
 from min_cost_flow_instance import MinCostFlow
 
-kappa = 10
-
 
 class Color(Enum):
     WHITE = 0
@@ -37,7 +35,7 @@ class Howard:
     gradients: NDArray[np.float64]
     lengths: NDArray[np.float64]
 
-    def __init__(self, graph: MinCostFlow, f: NDArray[np.float64]):
+    def __init__(self, graph: MinCostFlow, gradients: NDArray[np.float64], lengths: NDArray[np.float64]):
         self.g = graph
 
         self.V = graph.n
@@ -46,8 +44,8 @@ class Howard:
         self.colors = [Color.WHITE] * self.V
         self.bad_vertices = [False] * self.V
 
-        self.gradients = graph.calc_gradients(f)
-        self.lengths = graph.calc_lengths(f)
+        self.gradients = gradients
+        self.lengths = lengths
 
         # In-edges lists for policy graph
         self.in_edges_list = [[] for _ in range(self.V)]
@@ -228,15 +226,14 @@ class Howard:
 
             current = target
 
-        gd = self.gradients.dot(edge_cycle)
-        eta: float = -kappa / gd
-
-        return edge_cycle * eta
+        return edge_cycle
 
 
 def minimum_cycle_ratio(
-    g: MinCostFlow, f: NDArray[np.float64]
+    g: MinCostFlow,
+    gradients: NDArray[np.float64],
+    lengths: NDArray[np.float64],
 ) -> tuple[float, NDArray[np.float64]]:
     """Find minimum cycle ratio in graph"""
-    howard = Howard(g, f)
+    howard = Howard(g, gradients, lengths)
     return howard.find_optimum_cycle_ratio()
