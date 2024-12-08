@@ -1,14 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
-from enum import Enum
 
 from min_cost_flow_instance import MinCostFlow
-
-
-class Color(Enum):
-    WHITE = 0
-    BLACK = 1
-
 
 INF = float("inf")
 EPS = -0.005
@@ -21,7 +14,6 @@ class Howard:
     V: int
     distances: list[float]
     policy: list[int]
-    colors: list[Color]
     bad_vertices: list[bool]  # Vertices with no outgoing edges.
     in_edges_list: list[list[int]]
 
@@ -35,13 +27,17 @@ class Howard:
     gradients: NDArray[np.float64]
     lengths: NDArray[np.float64]
 
-    def __init__(self, graph: MinCostFlow, gradients: NDArray[np.float64], lengths: NDArray[np.float64]):
+    def __init__(
+        self,
+        graph: MinCostFlow,
+        gradients: NDArray[np.float64],
+        lengths: NDArray[np.float64],
+    ):
         self.g = graph
 
         self.V = graph.n
         self.distances = [0.0] * self.V
         self.policy = [-1] * self.V  # Current edge choice for each vertex
-        self.colors = [Color.WHITE] * self.V
         self.bad_vertices = [False] * self.V
 
         self.gradients = gradients
@@ -59,7 +55,7 @@ class Howard:
 
     def _compute_bound(self) -> float:
         """Compute bound for cycle ratio"""
-        closest_to_zero = float("inf")
+        closest_to_zero = INF
         sum_weights = 0.0
 
         for i in range(self.g.m):
@@ -186,18 +182,17 @@ class Howard:
         self._construct_policy_graph()
 
         iteration = 0
-        ratio = float("inf")
+        ratio = INF
 
         while iteration < 100:  # Limit iterations to avoid infinite loops
             # Find current ratio
-            ratio = float("inf")
+            ratio = INF
 
             for v in range(self.V):
-                if self.colors[v] == Color.WHITE:
-                    cycle_vertex = self._find_cycle_vertex(v)
-                    curr_ratio = self._compute_cycle_ratio(cycle_vertex)
-                    if ratio > curr_ratio:
-                        ratio = curr_ratio
+                cycle_vertex = self._find_cycle_vertex(v)
+                curr_ratio = self._compute_cycle_ratio(cycle_vertex)
+                if ratio > curr_ratio:
+                    ratio = curr_ratio
 
             # Try to improve policy
             if not self._improve_policy(ratio):
@@ -206,7 +201,7 @@ class Howard:
             iteration += 1
 
         if ratio > self.bound - 1e-10 or self.critical_cycle is None:
-            return float("inf"), [], np.zeros(self.g.m, dtype=np.float64)
+            return INF, np.zeros(self.g.m, dtype=np.float64)
         else:
             return ratio, self._numpy_cycle()
 
