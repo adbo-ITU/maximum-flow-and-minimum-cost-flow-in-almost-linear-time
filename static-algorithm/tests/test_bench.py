@@ -1,4 +1,4 @@
-from main import max_flow_with_guess
+from main import max_flow, max_flow_with_guess
 from tests.find_max_flow import find_max_flow
 from tests.utils import make_edges_and_capacities
 from tests.verifier import assert_valid_solution
@@ -7,22 +7,51 @@ import pytest
 import pathlib
 from typing import List
 import benchmark
+from dataclasses import dataclass
 
 
-def eval_files(files: List[str]):
-    for file in files:
+def run_with_guess(edges, capacities, s, t, optimal_flow):
+    return max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=optimal_flow)
+
+def run_with_binary_search(edges, capacities, s, t):
+    return max_flow(edges, capacities, s=s, t=t)
+
+
+@dataclass
+class Config:
+    file: str
+    binary_search: bool = False
+    scale_capacity: int = 1
+
+    def id(self):
+        h = hash((self.file, self.binary_search, self.scale_capacity))
+        return f"{self.file}-{h}"
+
+
+def eval_files(configs: List[Config]):
+    for config in configs:
+        file = config.file
         path = pathlib.Path(__file__).parent.parent / "data" / file
         with open(path) as f:
             content = f.read()
 
         graph, s, t = parse_input(content)
-        print("Running test for", len(graph), "edges")
         edges, capacities, _ = make_edges_and_capacities(graph)
+        capacities = [c * config.scale_capacity for c in capacities]
+
+        print("Running test for", len(graph), "edges")
+        benchmark.start_benchmark(config.id())
+        benchmark.register("filename", file)
 
         actual_max_flow, _ = find_max_flow(edges, capacities, s=s, t=t)
 
-        benchmark.start_benchmark(file)
-        mf, flows = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=actual_max_flow)
+        if config.binary_search:
+            mf, flows = max_flow(edges, capacities, s=s, t=t)
+        else:
+            mf, flows = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=actual_max_flow)
+
+        benchmark.register("actual_max_flow", actual_max_flow)
+        benchmark.register("max_flow_result", mf)
         benchmark.end_benchmark()
 
         assert mf == actual_max_flow, f"Expected max flow {actual_max_flow}, got {mf}"
@@ -43,7 +72,7 @@ DAG_FILES = [
 
 @pytest.mark.slow
 def test_bench_dag():
-    eval_files(DAG_FILES)
+    eval_files([Config(file=f) for f in DAG_FILES])
 
 
 FULLY_CONNECTED_FILES = [
@@ -53,14 +82,28 @@ FULLY_CONNECTED_FILES = [
     "fully_connected_edges_380.txt",
 ]
 
+
 @pytest.mark.slow
 def test_bench_fully_connected():
-    eval_files(FULLY_CONNECTED_FILES)
+    eval_files([Config(file=f) for f in FULLY_CONNECTED_FILES])
 
 
 @pytest.mark.slow
 def test_bench_all():
-    eval_files(DAG_FILES + FULLY_CONNECTED_FILES)
+    eval_files([Config(file=f) for f in DAG_FILES + FULLY_CONNECTED_FILES])
+
+
+@pytest.mark.slow
+def test_bench_binary_search():
+    # TODO: vary U
+
+    files = ["dag_edges_25.txt"]
+    configs = []
+    for f in files:
+        for scale in [1, 16, 64, 256]:
+            configs.append(Config(file=f, binary_search=True, scale_capacity=scale))
+
+    eval_files(configs)
 
 
 def make_pgfplots_coords(inps, iters):

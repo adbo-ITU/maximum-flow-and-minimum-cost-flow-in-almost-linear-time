@@ -104,7 +104,7 @@ def max_flow_with_guess(
 
         log()
 
-    benchmark.register("iterations", i)
+    benchmark.register_or_update("iterations", i, lambda x: x + i)
     print_edge_updates()
 
     log("rounded flow:", np.round(cur_flow[:original_m]))
@@ -121,9 +121,12 @@ def max_flow(
 ):
     max_possible_flow = sum(capacities[e] for e, (u, _) in enumerate(edges) if u == s)
 
+    iters = 0
     low, high = 0, max_possible_flow + 1
     mf, flows = None, None
     while low < high:
+        iters+= 1
+
         mid = (low + high) // 2
         mf, flows = max_flow_with_guess(
             edges,
@@ -139,7 +142,9 @@ def max_flow(
         else:
             low = mid + 1
 
+    benchmark.register("binary_search_iters", iters)
     print_edge_updates()
+
     # TODO: fix this, I'm pretty sure this can be off by one
     return mf, flows
 

@@ -11,7 +11,6 @@ def start_benchmark(id: str):
     global CUR_BENCH
     CUR_BENCH = id
     BENCH_INFO[CUR_BENCH] = {
-        "id": id,
         "start": time.time_ns()
     }
 
@@ -21,6 +20,16 @@ def register(key: str, value):
         return
 
     BENCH_INFO[CUR_BENCH][key] = value
+
+
+def register_or_update(key: str, default, updater):
+    if CUR_BENCH is None:
+        return
+
+    if key in BENCH_INFO[CUR_BENCH]:
+        BENCH_INFO[CUR_BENCH][key] = updater(BENCH_INFO[CUR_BENCH][key])
+    else:
+        BENCH_INFO[CUR_BENCH][key] = default
 
 
 def end_benchmark():
