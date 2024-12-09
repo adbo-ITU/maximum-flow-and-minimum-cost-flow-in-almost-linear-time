@@ -1,10 +1,12 @@
 from typing import Tuple
+
+from numpy.typing import NDArray
 from howard import minimum_cycle_ratio
 from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
 import numpy as np
-from utils import count_edge_updates, log, print_edge_updates
 import benchmark
+from utils import log
 
 
 def max_flow_with_guess(
@@ -30,12 +32,15 @@ def max_flow_with_guess(
     I.print_B()
     log()
 
-    benchmark.register("instance", {
-        "m": I.m,
-        "n": I.n,
-        "U": I.U,
-        "alpha": I.alpha,
-    })
+    benchmark.register(
+        "instance",
+        {
+            "m": I.m,
+            "n": I.n,
+            "U": I.U,
+            "alpha": I.alpha,
+        },
+    )
 
     original_m = I.m
     flow_idx = original_m - 1
@@ -56,11 +61,14 @@ def max_flow_with_guess(
     kappa = 0.9999
     upscale = 500
 
-    benchmark.register("parameters", {
-        "threshold": threshold,
-        "kappa": kappa,
-        "scalefactor": upscale,
-    })
+    benchmark.register(
+        "parameters",
+        {
+            "threshold": threshold,
+            "kappa": kappa,
+            "scalefactor": upscale,
+        },
+    )
 
     i = 0
     cur_phi = I.phi(cur_flow)
@@ -79,7 +87,7 @@ def max_flow_with_guess(
         min_ratio, min_ratio_cycle = minimum_cycle_ratio(I, gradients, lengths)
         count_edge_updates(min_ratio_cycle)
 
-        eta = -kappa**2 / (50 * gradients.dot(min_ratio_cycle))
+        eta = -(kappa**2) / (50 * gradients.dot(min_ratio_cycle))
         augment_cycle = min_ratio_cycle * (eta * upscale)
 
         cur_flow += augment_cycle
@@ -105,7 +113,7 @@ def max_flow_with_guess(
         log()
 
     benchmark.register_or_update("iterations", i, lambda x: x + i)
-    print_edge_updates()
+    register_avg()
 
     log("rounded flow:", np.round(cur_flow[:original_m]))
 
@@ -125,7 +133,7 @@ def max_flow(
     low, high = 0, max_possible_flow + 1
     mf, flows = None, None
     while low < high:
-        iters+= 1
+        iters += 1
 
         mid = (low + high) // 2
         mf, flows = max_flow_with_guess(
@@ -143,7 +151,7 @@ def max_flow(
             low = mid + 1
 
     benchmark.register("binary_search_iters", iters)
-    print_edge_updates()
+    register_avg()
 
     # TODO: fix this, I'm pretty sure this can be off by one
     return mf, flows
@@ -168,3 +176,28 @@ if __name__ == "__main__":
     ans = max_flow(edges, capacities, s=0, t=5)
 
     print("Found max flow:", ans)
+
+
+def count_edge_updates(cycle: NDArray[np.float64]):
+    edge_updates = sum(x != 0.0 for x in cycle)
+    benchmark.register_or_update(
+        "chen_total_updates", edge_updates, lambda x: x + edge_updates
+    )
+    benchmark.register_or_update(
+        "chen_max_updates",
+        edge_updates,
+        lambda x: edge_updates if edge_updates > x else x,
+    )
+    benchmark.register_or_update(
+        "chen_min_updates",
+        edge_updates,
+        lambda x: edge_updates if edge_updates < x else x,
+    )
+    benchmark.register_or_update("chen_total_iterations", 1, lambda x: x + 1)
+
+
+def register_avg():
+    total_updates = benchmark.get_or_default("chen_total_updates", 0)
+    total_iters = benchmark.get_or_default("chen_total_iterations", 1)
+    if total_iters != None:
+        benchmark.register("chen_avg_updates", total_updates / total_iters)

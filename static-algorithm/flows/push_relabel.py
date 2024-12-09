@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+import benchmark
 from tests.utils import Edge
 
 
@@ -14,8 +15,7 @@ class PushRelabel:
     height: list[int]
     excess: list[int]
 
-    edge_updates: list[int]
-    edge_update: int
+    edge_updates: int
 
     def __init__(self, edges: list[Edge], capacities: list[int]):
         """Initialize push-relabel algorithm with n vertices."""
@@ -34,13 +34,28 @@ class PushRelabel:
         self.height = [0] * self.n
         self.excess = [0] * self.n
 
-        self.edge_updates = []
-        self.edge_update = 0
+        self.edge_updates = 0
 
     def new_iteration(self):
         """Reset edge update counter."""
-        self.edge_updates.append(self.edge_update)
-        self.edge_update = 0
+        edge_updates = self.edge_updates
+        benchmark.register_or_update(
+            "push_relabel_total_updates", edge_updates, lambda x: x + edge_updates
+        )
+        benchmark.register_or_update(
+            "push_relabel_max_updates",
+            edge_updates,
+            lambda x: edge_updates if edge_updates > x else x,
+        )
+        benchmark.register_or_update(
+            "push_relabel_min_updates",
+            edge_updates,
+            lambda x: edge_updates if edge_updates < x else x,
+        )
+        benchmark.register_or_update(
+            "push_relabel_total_iterations", 1, lambda x: x + 1
+        )
+        self.edge_updates = 0
 
     def add_edge(self, u: int, v: int, cap: int) -> None:
         """Add an edge from u to v with capacity cap."""
@@ -54,7 +69,7 @@ class PushRelabel:
         self.excess[u] -= d
         self.excess[v] += d
 
-        self.edge_update += 2
+        self.edge_updates += 2
 
     def relabel(self, u: int) -> None:
         """Relabel vertex u by increasing its height."""
@@ -116,5 +131,10 @@ class PushRelabel:
                     self.relabel(i)
                     break
 
-        self.new_iteration()
+        total_updates = benchmark.get_or_default("push_relabel_total_updates", 0)
+        total_iters = benchmark.get_or_default("push_relabel_total_iterations", 1)
+        if total_iters != None:
+            benchmark.register("push_relabel_avg_updates", total_updates / total_iters)
+        benchmark.register("push_relabel_flow", self.excess[t])
+
         return self.excess[t]

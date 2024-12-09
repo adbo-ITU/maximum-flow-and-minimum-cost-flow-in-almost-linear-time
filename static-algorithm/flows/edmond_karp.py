@@ -1,16 +1,14 @@
 # Based upon the C++ implementation from here https://cp-algorithms.com/graph/min_cost_flow.html
 from collections import defaultdict, deque
 
+import benchmark
 from tests.utils import Edge
-import utils
 
 
 class MaxFlow:
     n: int
     capacities: defaultdict[int, defaultdict[int, int]]
     adj: defaultdict[int, list[int]]
-
-    edge_updates: list[int]
 
     def __init__(self, edges: list[Edge], capacities: list[int]):
         self.capacities = defaultdict(lambda: defaultdict(lambda: 0))
@@ -28,8 +26,6 @@ class MaxFlow:
         for u, v in edges:
             self.adj[u].append(v)
             self.adj[v].append(u)
-
-        self.edge_updates = []
 
     def bfs(self, s: int, t: int, parent: list[int]) -> int:
         INF = float("inf")
@@ -62,32 +58,39 @@ class MaxFlow:
             cur = t
 
             edge_updates = 0
-
             while cur != s:
                 prev = parent[cur]
-                edge_updates += 2
                 self.capacities[prev][cur] -= new_flow
                 self.capacities[cur][prev] += new_flow
                 cur = prev
 
-            if utils.ENABLE_EDGE_COUNT:
-                self.edge_updates.append(edge_updates)
+                edge_updates += 2
 
-        if utils.ENABLE_EDGE_COUNT:
-            print("[EDMOND BFS] Flow:", flow)
-            if utils.ENABLE_ALL_EDGE_COUNT:
-                print("[EDMOND BFS] Edge updates:", self.edge_updates)
-            print("[EDMOND BFS] Total edge updates:", sum(self.edge_updates))
-            print("[EDMOND BFS] Max edge updates:", max(self.edge_updates))
-            print("[EDMOND BFS] Min edge updates:", min(self.edge_updates))
-            print(
-                "[EDMOND BFS] Average edge updates:",
-                sum(self.edge_updates) / len(self.edge_updates),
+            benchmark.register_or_update(
+                "edmond_total_updates", edge_updates, lambda x: x + edge_updates
             )
+            benchmark.register_or_update(
+                "edmond_max_updates",
+                edge_updates,
+                lambda x: edge_updates if edge_updates > x else x,
+            )
+            benchmark.register_or_update(
+                "edmond_min_updates",
+                edge_updates,
+                lambda x: edge_updates if edge_updates < x else x,
+            )
+            benchmark.register_or_update("edmond_total_iterations", 1, lambda x: x + 1)
+
+        total_updates = benchmark.get_or_default("edmond_total_updates", 0)
+        total_iters = benchmark.get_or_default("edmond_total_iterations", 1)
+        if total_iters != None:
+            benchmark.register("edmond_avg_updates", total_updates / total_iters)
 
         return flow
 
     def max_flow(self, s: int, t: int) -> int:
         bfs_flow = self.maxflow_bfs(s, t)
+
+        benchmark.register("edmond_flow", bfs_flow)
 
         return bfs_flow

@@ -10,9 +10,7 @@ CUR_BENCH = None
 def start_benchmark(id: str):
     global CUR_BENCH
     CUR_BENCH = id
-    BENCH_INFO[CUR_BENCH] = {
-        "start": time.time_ns()
-    }
+    BENCH_INFO[CUR_BENCH] = {"start": time.time_ns()}
 
 
 def register(key: str, value):
@@ -20,6 +18,16 @@ def register(key: str, value):
         return
 
     BENCH_INFO[CUR_BENCH][key] = value
+
+
+def get_or_default(key: str, default):
+    if CUR_BENCH is None:
+        return None
+
+    if key in BENCH_INFO[CUR_BENCH]:
+        return BENCH_INFO[CUR_BENCH][key]
+    else:
+        return default
 
 
 def register_or_update(key: str, default, updater):
@@ -35,11 +43,13 @@ def register_or_update(key: str, default, updater):
 def end_benchmark():
     global CUR_BENCH
     BENCH_INFO[CUR_BENCH]["end"] = time.time_ns()
-    BENCH_INFO[CUR_BENCH]["duration_s"] = (BENCH_INFO[CUR_BENCH]["end"] - BENCH_INFO[CUR_BENCH]["start"]) / 1e9
+    BENCH_INFO[CUR_BENCH]["duration_s"] = (
+        BENCH_INFO[CUR_BENCH]["end"] - BENCH_INFO[CUR_BENCH]["start"]
+    ) / 1e9
     CUR_BENCH = None
 
     # so we have the data if we kill the program or it crashes
-    write_benchmark(f"benchmark-tmp.json") 
+    write_benchmark(f"benchmark-tmp.json")
 
 
 def write_benchmark(filename: str | None = None):

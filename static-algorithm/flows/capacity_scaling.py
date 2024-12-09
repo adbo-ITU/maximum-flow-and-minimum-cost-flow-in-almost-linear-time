@@ -1,4 +1,5 @@
 from collections import defaultdict
+import benchmark
 from tests.utils import Edge
 import utils
 
@@ -22,8 +23,7 @@ def find_max_flow(
         for v, c in d.items():
             flow_edges.append((u, v, c))
 
-    print(f"[CAPACITY] Max flow: {max_flow}")
-    print("[CAPACITY] Flow edges:", flow_edges)
+    benchmark.register("capacity_flow", max_flow)
 
     return max_flow, flow_edges
 
@@ -54,7 +54,6 @@ def bfs(
 def flow(
     orggraph: defaultdict[int, defaultdict[int, int]], src: int, dest: int
 ) -> tuple[int, defaultdict[int, defaultdict[int, int]], set[int]]:
-    edge_updates: list[int] = []
     graph: defaultdict[int, defaultdict[int, int]] = defaultdict(
         lambda: defaultdict(int)
     )
@@ -73,15 +72,11 @@ def flow(
                 mincap = mincap // 2
                 continue
             else:
-                if utils.ENABLE_EDGE_COUNT:
-                    if utils.ENABLE_ALL_EDGE_COUNT:
-                        print("[CAPACITY] Edge updates:", edge_updates)
-                    print("[CAPACITY] Total edge updates:", sum(edge_updates))
-                    print("[CAPACITY] Max edge updates:", max(edge_updates))
-                    print("[CAPACITY] Min edge updates:", min(edge_updates))
-                    print(
-                        "[CAPACITY] Average edge updates:",
-                        sum(edge_updates) / len(edge_updates),
+                total_updates = benchmark.get_or_default("capacity_total_updates", 0)
+                total_iters = benchmark.get_or_default("capacity_total_iterations", 1)
+                if total_iters != None:
+                    benchmark.register(
+                        "capacity_avg_updates", total_updates / total_iters
                     )
                 return (
                     current_flow,
@@ -94,11 +89,23 @@ def flow(
         p: list[tuple[int, int]] = p_or_seen
         saturation = min(graph[u][v] for u, v in p)
         current_flow += saturation
-        edge_update = 0
+        edge_updates = 0
         for u, v in p:
-            edge_update += 2
+            edge_updates += 2
             graph[u][v] -= saturation
             graph[v][u] += saturation
 
-        if utils.ENABLE_EDGE_COUNT:
-            edge_updates.append(edge_update)
+        benchmark.register_or_update(
+            "capacity_total_updates", edge_updates, lambda x: x + edge_updates
+        )
+        benchmark.register_or_update(
+            "capacity_max_updates",
+            edge_updates,
+            lambda x: edge_updates if edge_updates > x else x,
+        )
+        benchmark.register_or_update(
+            "capacity_min_updates",
+            edge_updates,
+            lambda x: edge_updates if edge_updates < x else x,
+        )
+        benchmark.register_or_update("capacity_total_iterations", 1, lambda x: x + 1)

@@ -1,4 +1,5 @@
 import pytest
+import benchmark
 from main import max_flow, max_flow_with_guess
 from tests.utils import make_edges_and_capacities
 from tests.verifier import assert_valid_solution
@@ -17,13 +18,6 @@ CP_ALGORITHMS_GRAPH = [
     ((3, 5), 8),
     ((4, 5), 5),
 ]
-
-
-@pytest.fixture(autouse=True)
-def reset_count():
-    utils.reset_edge_updates()
-    yield  # allows us to have cleanup after the test
-    utils.reset_edge_updates()
 
 
 def test_flow_sample_from_cp_algorithms_binary_search():
