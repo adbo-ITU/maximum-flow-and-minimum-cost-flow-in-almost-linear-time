@@ -13,6 +13,7 @@ from dataclasses import dataclass
 def run_with_guess(edges, capacities, s, t, optimal_flow):
     return max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=optimal_flow)
 
+
 def run_with_binary_search(edges, capacities, s, t):
     return max_flow(edges, capacities, s=s, t=t)
 
@@ -28,11 +29,14 @@ class Config:
         return f"{self.file}-{h}"
 
     def register_params(self):
-        benchmark.register("bench_config", {
-            "file": self.file,
-            "binary_search": self.binary_search,
-            "scale_capacity": self.scale_capacity
-        })
+        benchmark.register(
+            "bench_config",
+            {
+                "file": self.file,
+                "binary_search": self.binary_search,
+                "scale_capacity": self.scale_capacity,
+            },
+        )
 
 
 def eval_files(configs: List[Config]):
@@ -55,7 +59,9 @@ def eval_files(configs: List[Config]):
         if config.binary_search:
             mf, flows = max_flow(edges, capacities, s=s, t=t)
         else:
-            mf, flows = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=actual_max_flow)
+            mf, flows = max_flow_with_guess(
+                edges, capacities, s=s, t=t, optimal_flow=actual_max_flow
+            )
 
         benchmark.register("actual_max_flow", actual_max_flow)
         benchmark.register("max_flow_result", mf)
@@ -75,8 +81,9 @@ DAG_FILES = [
     "dag_edges_150.txt",
     "dag_edges_200.txt",
     "dag_edges_250.txt",
-    "dag_edges_500.txt"
+    "dag_edges_500.txt",
 ]
+
 
 @pytest.mark.slow
 def test_bench_dag():
@@ -96,9 +103,30 @@ def test_bench_fully_connected():
     eval_files([Config(file=f) for f in FULLY_CONNECTED_FILES])
 
 
+LINE_FILES = [
+    "line_edges_25.txt",
+    "line_edges_50.txt",
+    "line_edges_100.txt",
+    "line_edges_150.txt",
+    "line_edges_200.txt",
+    "line_edges_250.txt",
+    "line_edges_500.txt",
+]
+
+
+@pytest.mark.slow
+def test_bench_line():
+    eval_files([Config(file=f) for f in LINE_FILES])
+
+
+@pytest.mark.slow
+def test_bench_dag_250():
+    eval_files([Config(file=f) for f in ["dag_edges_250.txt"]])
+
+
 @pytest.mark.slow
 def test_bench_all():
-    eval_files([Config(file=f) for f in DAG_FILES + FULLY_CONNECTED_FILES])
+    eval_files([Config(file=f) for f in DAG_FILES + FULLY_CONNECTED_FILES + LINE_FILES])
 
 
 @pytest.mark.slow
