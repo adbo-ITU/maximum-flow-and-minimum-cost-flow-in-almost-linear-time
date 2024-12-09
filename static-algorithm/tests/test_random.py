@@ -1,5 +1,5 @@
 from main import max_flow_with_guess
-from tests.find_max_flow import find_max_flow
+from flows.capacity_scaling import find_max_flow
 from tests.utils import make_edges_and_capacities
 from tests.verifier import assert_valid_solution
 import pytest

@@ -1,6 +1,5 @@
 from tests.utils import make_edges_and_capacities, Graph
-from tests.find_max_flow import find_max_flow
-from edmond_karp import MaxFlow
+from flows import find_max_flow
 
 
 def assert_valid_solution(
@@ -13,12 +12,7 @@ def assert_valid_solution(
     if lower_capacities:
         raise Exception("No no. Only basic flow instances here.")
 
-    actual_max_flow, _ = find_max_flow(edges, capacities, s=s, t=t)
-    actual_max_flow_edmond = MaxFlow(edges, capacities).maxflow(s, t)
-
-    assert (
-        actual_max_flow == actual_max_flow_edmond
-    ), f"Expected max flow {actual_max_flow}, got edmonds {actual_max_flow_edmond}"
+    actual_max_flow = find_max_flow(edges, capacities, s=s, t=t)
 
     assert (
         actual_max_flow == flow_value

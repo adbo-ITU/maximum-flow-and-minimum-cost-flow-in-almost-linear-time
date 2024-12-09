@@ -1,5 +1,5 @@
 from main import max_flow_with_guess
-from tests.find_max_flow import find_max_flow
+from flows import find_max_flow
 from tests.utils import make_edges_and_capacities
 from tests.verifier import assert_valid_solution
 from tests.test_random import parse_input
@@ -25,24 +25,25 @@ def eval_files(files: List[str]):
         print("Running test for", len(graph), "edges")
         edges, capacities, _ = make_edges_and_capacities(graph)
 
-        actual_max_flow, _ = find_max_flow(edges, capacities, s=s, t=t)
-        mf, flows = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=actual_max_flow)
+        actual_max_flow = find_max_flow(edges, capacities, s=s, t=t)
+        mf, flows = max_flow_with_guess(
+            edges, capacities, s=s, t=t, optimal_flow=actual_max_flow
+        )
         assert mf == actual_max_flow, f"Expected max flow {actual_max_flow}, got {mf}"
 
     return inps
 
 
-
 @pytest.mark.slow
 def test_bench_dag():
-    files =  [
+    files = [
         "dag_edges_25.txt",
         "dag_edges_50.txt",
         "dag_edges_100.txt",
         "dag_edges_150.txt",
         "dag_edges_200.txt",
         "dag_edges_250.txt",
-        "dag_edges_500.txt"
+        "dag_edges_500.txt",
     ]
 
     inps = eval_files(files)
@@ -50,7 +51,6 @@ def test_bench_dag():
     # https://regex101.com/r/o5upRj/1
     iters = [
         # s=500
-
         # 2764,
         # 5233,
         # 9606,
@@ -58,9 +58,7 @@ def test_bench_dag():
         # 18379,
         # 22444,
         # 43833
-
         # s=250
-
         5546,
         10477,
         19311,
@@ -68,11 +66,8 @@ def test_bench_dag():
         34962,
         42735,
         86379,
-        108309
-
-
+        108309,
         # s=100
-
         # 13891,
         # 25899,
         # 48290,
@@ -83,7 +78,7 @@ def test_bench_dag():
 
 @pytest.mark.slow
 def test_bench_fully_connected():
-    files =  [
+    files = [
         "fully_connected_edges_20.txt",
         "fully_connected_edges_90.txt",
         "fully_connected_edges_210.txt",
@@ -95,25 +90,20 @@ def test_bench_fully_connected():
     # https://regex101.com/r/o5upRj/1
     iters = [
         # s=500
-
         # 1718,
         # 7444,
         # 16436,
         # 29487,
-
         # s=250
-
         # 3453,
         # 15137,
         # 33584,
         # 60861
-
         # s=100
-
         8658,
         37737,
         80423,
-        145301
+        145301,
     ]
 
     make_pgfplots_coords(inps, iters)

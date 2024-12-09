@@ -1,19 +1,23 @@
-from collections import defaultdict, deque
+from collections import defaultdict
 from tests.utils import Edge
 import utils
 
 # all credit to Riko Jacob for this code
 
 
-def find_max_flow(edges: list[Edge], capacities: list[int], s: int, t: int):
-    graph = defaultdict(lambda: defaultdict(lambda: 0))
+def find_max_flow(
+    edges: list[Edge], capacities: list[int], s: int, t: int
+) -> tuple[int, list[tuple[int, int, int]]]:
+    graph: defaultdict[int, defaultdict[int, int]] = defaultdict(
+        lambda: defaultdict(lambda: 0)
+    )
 
     for (u, v), capacity in zip(edges, capacities):
         graph[u][v] = capacity
 
     max_flow, flow_graph, _ = flow(graph, s, t)
 
-    flow_edges = []
+    flow_edges: list[tuple[int, int, int]] = []
     for u, d in flow_graph.items():
         for v, c in d.items():
             flow_edges.append((u, v, c))
@@ -24,18 +28,20 @@ def find_max_flow(edges: list[Edge], capacities: list[int], s: int, t: int):
     return max_flow, flow_edges
 
 
-def bfs(graph, src, dest, mincap=0):  # returns path to dest
+def bfs(
+    graph: defaultdict[int, defaultdict[int, int]], src: int, dest: int, mincap: int = 0
+) -> tuple[bool, set[int] | list[tuple[int, int]]]:
     parent = {src: src}
     layer = [src]
     while layer:
-        nextlayer = []
+        nextlayer: list[int] = []
         for u in layer:
             for v, cap in graph[u].items():
                 if cap > mincap and v not in parent:
                     parent[v] = u
                     nextlayer.append(v)
                     if v == dest:
-                        p = []
+                        p: list[tuple[int, int]] = []
                         current_vertex = dest
                         while src != current_vertex:
                             p.append((parent[current_vertex], current_vertex))
@@ -45,9 +51,13 @@ def bfs(graph, src, dest, mincap=0):  # returns path to dest
     return (False, set(parent))
 
 
-def flow(orggraph, src, dest):
+def flow(
+    orggraph: defaultdict[int, defaultdict[int, int]], src: int, dest: int
+) -> tuple[int, defaultdict[int, defaultdict[int, int]], set[int]]:
     edge_updates: list[int] = []
-    graph = defaultdict(lambda: defaultdict(int))
+    graph: defaultdict[int, defaultdict[int, int]] = defaultdict(
+        lambda: defaultdict(int)
+    )
     maxcapacity = 0
     for u, d in orggraph.items():
         for v, c in d.items():
@@ -81,11 +91,8 @@ def flow(orggraph, src, dest):
                     },
                     p_or_seen,
                 )
-        p = p_or_seen
+        p: list[tuple[int, int]] = p_or_seen
         saturation = min(graph[u][v] for u, v in p)
-        # for i in range(len(p)-1):
-        #     assert(p[i][0] == p[i+1][1])
-        # print(current_flow,saturation,file=sys.stderr)#,[f"{u[0]}-{u[1]}:{inp[u[0]][u[1]]}:{graph[u][v]}" for u,v in p if u[2]==0])
         current_flow += saturation
         edge_update = 0
         for u, v in p:
@@ -95,19 +102,3 @@ def flow(orggraph, src, dest):
 
         if utils.ENABLE_EDGE_COUNT:
             edge_updates.append(edge_update)
-
-
-def retain_only_active_edges(original_graph, graph):
-    flow_graph = dict()
-
-    for u, adj in original_graph.items():
-        edges = dict()
-
-        for v, capacity in adj.items():
-            if graph[u][v] < capacity:
-                edges[v] = capacity - graph[u][v]
-
-        if len(edges):
-            flow_graph[u] = edges
-
-    return flow_graph
