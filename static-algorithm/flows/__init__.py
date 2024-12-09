@@ -5,8 +5,8 @@ from tests.utils import Edge
 
 def find_max_flow(edges: list[Edge], capacities: list[int], s: int, t: int):
     cap, _ = cap_find_max_flow(edges, capacities, s, t)
-    edk = MaxFlow(edges, capacities)
+    edk = MaxFlow(edges, capacities).max_flow(s, t)
 
-    assert cap == edk.maxflow_bfs(s, t)
+    assert cap == edk
 
     return cap

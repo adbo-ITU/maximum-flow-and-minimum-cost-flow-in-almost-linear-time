@@ -1,4 +1,4 @@
-# Based on https://cp-algorithms.com/graph/min_cost_flow.html
+# Based upon the C++ implementation from here https://cp-algorithms.com/graph/min_cost_flow.html
 from collections import defaultdict, deque
 
 from tests.utils import Edge
@@ -87,7 +87,7 @@ class MaxFlow:
 
         return flow
 
-    def maxflow(self, s: int, t: int) -> int:
+    def max_flow(self, s: int, t: int) -> int:
         bfs_flow = self.maxflow_bfs(s, t)
 
         return bfs_flow
