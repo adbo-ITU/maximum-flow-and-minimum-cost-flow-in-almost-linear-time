@@ -53,6 +53,12 @@ def write_benchmark(filename: str | None = None):
         json.dump(BENCH_INFO, f, cls=NpEncoder, indent=4)
 
 
+def clear():
+    global BENCH_INFO,CUR_BENCH
+    BENCH_INFO = {}
+    CUR_BENCH = None
+
+
 class NpEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, np.integer):

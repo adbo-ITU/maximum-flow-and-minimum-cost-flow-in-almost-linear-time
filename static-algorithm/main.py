@@ -121,6 +121,8 @@ def max_flow(
 ):
     max_possible_flow = sum(capacities[e] for e, (u, _) in enumerate(edges) if u == s)
 
+    benchmark.register("max_possible_flow", max_possible_flow)
+
     iters = 0
     low, high = 0, max_possible_flow + 1
     mf, flows = None, None

@@ -27,6 +27,13 @@ class Config:
         h = hash((self.file, self.binary_search, self.scale_capacity))
         return f"{self.file}-{h}"
 
+    def register_params(self):
+        benchmark.register("bench_config", {
+            "file": self.file,
+            "binary_search": self.binary_search,
+            "scale_capacity": self.scale_capacity
+        })
+
 
 def eval_files(configs: List[Config]):
     for config in configs:
@@ -41,7 +48,7 @@ def eval_files(configs: List[Config]):
 
         print("Running test for", len(graph), "edges")
         benchmark.start_benchmark(config.id())
-        benchmark.register("filename", file)
+        config.register_params()
 
         actual_max_flow, _ = find_max_flow(edges, capacities, s=s, t=t)
 
@@ -58,6 +65,7 @@ def eval_files(configs: List[Config]):
         # assert mf == actual_max_flow, f"Expected max flow {actual_max_flow}, got {mf}"
 
     benchmark.write_benchmark()
+    benchmark.clear()
 
 
 DAG_FILES = [
@@ -98,22 +106,10 @@ def test_bench_all():
 def test_bench_binary_search():
     # TODO: vary U
 
-    files = ["dag_edges_25.txt"]
+    files = ["dag_edges_50.txt", "dag_edges_25.txt"]
     configs = []
     for f in files:
-        for scale in [1, 16, 64, 256]:
+        for scale in [1, 2, 4, 8, 16, 32, 64, 128, 256]:
             configs.append(Config(file=f, binary_search=True, scale_capacity=scale))
 
     eval_files(configs)
-
-
-def make_pgfplots_coords(inps, iters):
-    # lines = ["Edges & IPM iterations"]
-    coords = []
-    for inp, its in zip(inps, iters):
-        graph, s, t = inp
-        coords.append(f"({len(graph)},{its})")
-
-        # lines.append(f"{len(graph)} & {its} \\\\")
-
-    print("".join(coords))
