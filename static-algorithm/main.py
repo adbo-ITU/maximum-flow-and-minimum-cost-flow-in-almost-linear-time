@@ -4,6 +4,7 @@ from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
 import numpy as np
 from utils import count_edge_updates, log, print_edge_updates
+import benchmark
 
 
 def max_flow_with_guess(
@@ -29,6 +30,13 @@ def max_flow_with_guess(
     I.print_B()
     log()
 
+    benchmark.register("instance", {
+        "m": I.m,
+        "n": I.n,
+        "U": I.U,
+        "alpha": I.alpha,
+    })
+
     original_m = I.m
     flow_idx = original_m - 1
     I, cur_flow = calc_feasible_flow(I)
@@ -47,6 +55,12 @@ def max_flow_with_guess(
 
     kappa = 0.9999
     upscale = 500
+
+    benchmark.register("parameters", {
+        "threshold": threshold,
+        "kappa": kappa,
+        "scalefactor": upscale,
+    })
 
     i = 0
     cur_phi = I.phi(cur_flow)
@@ -90,8 +104,8 @@ def max_flow_with_guess(
 
         log()
 
+    benchmark.register_or_update("iterations", i, lambda x: x + i)
     print_edge_updates()
-    print("Iterations:", i)
 
     log("rounded flow:", np.round(cur_flow[:original_m]))
 
@@ -107,9 +121,12 @@ def max_flow(
 ):
     max_possible_flow = sum(capacities[e] for e, (u, _) in enumerate(edges) if u == s)
 
+    iters = 0
     low, high = 0, max_possible_flow + 1
     mf, flows = None, None
     while low < high:
+        iters+= 1
+
         mid = (low + high) // 2
         mf, flows = max_flow_with_guess(
             edges,
@@ -125,7 +142,9 @@ def max_flow(
         else:
             low = mid + 1
 
+    benchmark.register("binary_search_iters", iters)
     print_edge_updates()
+
     # TODO: fix this, I'm pretty sure this can be off by one
     return mf, flows
 

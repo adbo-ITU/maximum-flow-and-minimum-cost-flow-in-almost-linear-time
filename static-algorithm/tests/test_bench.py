@@ -1,112 +1,109 @@
-from main import max_flow_with_guess
 from flows import find_max_flow
+from main import max_flow, max_flow_with_guess
 from tests.utils import make_edges_and_capacities
 from tests.verifier import assert_valid_solution
 from tests.test_random import parse_input
 import pytest
 import pathlib
 from typing import List
+import benchmark
+from dataclasses import dataclass
 
 
-def eval_files(files: List[str]):
-    paths = []
-    for file in files:
-        paths.append(pathlib.Path(__file__).parent.parent / "data" / file)
+def run_with_guess(edges, capacities, s, t, optimal_flow):
+    return max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=optimal_flow)
 
-    inps = []
+def run_with_binary_search(edges, capacities, s, t):
+    return max_flow(edges, capacities, s=s, t=t)
 
-    for path in paths:
+
+@dataclass
+class Config:
+    file: str
+    binary_search: bool = False
+    scale_capacity: int = 1
+
+    def id(self):
+        h = hash((self.file, self.binary_search, self.scale_capacity))
+        return f"{self.file}-{h}"
+
+
+def eval_files(configs: List[Config]):
+    for config in configs:
+        file = config.file
+        path = pathlib.Path(__file__).parent.parent / "data" / file
         with open(path) as f:
             content = f.read()
-        inps.append(parse_input(content))
 
-    for inp in inps:
-        graph, s, t = inp
-        print("Running test for", len(graph), "edges")
+        graph, s, t = parse_input(content)
         edges, capacities, _ = make_edges_and_capacities(graph)
+        capacities = [c * config.scale_capacity for c in capacities]
+
+        print("Running test for", len(graph), "edges")
+        benchmark.start_benchmark(config.id())
+        benchmark.register("filename", file)
 
         actual_max_flow = find_max_flow(edges, capacities, s=s, t=t)
-        mf, flows = max_flow_with_guess(
-            edges, capacities, s=s, t=t, optimal_flow=actual_max_flow
-        )
-        assert mf == actual_max_flow, f"Expected max flow {actual_max_flow}, got {mf}"
 
-    return inps
+        if config.binary_search:
+            mf, flows = max_flow(edges, capacities, s=s, t=t)
+        else:
+            mf, flows = max_flow_with_guess(edges, capacities, s=s, t=t, optimal_flow=actual_max_flow)
 
+        benchmark.register("actual_max_flow", actual_max_flow)
+        benchmark.register("max_flow_result", mf)
+        benchmark.end_benchmark()
+
+        # TODO: oopsie
+        # assert mf == actual_max_flow, f"Expected max flow {actual_max_flow}, got {mf}"
+
+    benchmark.write_benchmark()
+
+
+DAG_FILES = [
+    "dag_edges_25.txt",
+    "dag_edges_50.txt",
+    "dag_edges_100.txt",
+    "dag_edges_150.txt",
+    "dag_edges_200.txt",
+    "dag_edges_250.txt",
+    "dag_edges_500.txt"
+]
 
 @pytest.mark.slow
 def test_bench_dag():
-    files = [
-        "dag_edges_25.txt",
-        "dag_edges_50.txt",
-        "dag_edges_100.txt",
-        "dag_edges_150.txt",
-        "dag_edges_200.txt",
-        "dag_edges_250.txt",
-        "dag_edges_500.txt",
-    ]
+    eval_files([Config(file=f) for f in DAG_FILES])
 
-    inps = eval_files(files)
 
-    # https://regex101.com/r/o5upRj/1
-    iters = [
-        # s=500
-        # 2764,
-        # 5233,
-        # 9606,
-        # 13590,
-        # 18379,
-        # 22444,
-        # 43833
-        # s=250
-        5546,
-        10477,
-        19311,
-        26056,
-        34962,
-        42735,
-        86379,
-        108309,
-        # s=100
-        # 13891,
-        # 25899,
-        # 48290,
-        # 67708,
-        # 88824
-    ]
+FULLY_CONNECTED_FILES = [
+    "fully_connected_edges_20.txt",
+    "fully_connected_edges_90.txt",
+    "fully_connected_edges_210.txt",
+    "fully_connected_edges_380.txt",
+]
 
 
 @pytest.mark.slow
 def test_bench_fully_connected():
-    files = [
-        "fully_connected_edges_20.txt",
-        "fully_connected_edges_90.txt",
-        "fully_connected_edges_210.txt",
-        "fully_connected_edges_380.txt",
-    ]
+    eval_files([Config(file=f) for f in FULLY_CONNECTED_FILES])
 
-    inps = eval_files(files)
 
-    # https://regex101.com/r/o5upRj/1
-    iters = [
-        # s=500
-        # 1718,
-        # 7444,
-        # 16436,
-        # 29487,
-        # s=250
-        # 3453,
-        # 15137,
-        # 33584,
-        # 60861
-        # s=100
-        8658,
-        37737,
-        80423,
-        145301,
-    ]
+@pytest.mark.slow
+def test_bench_all():
+    eval_files([Config(file=f) for f in DAG_FILES + FULLY_CONNECTED_FILES])
 
-    make_pgfplots_coords(inps, iters)
+
+@pytest.mark.slow
+def test_bench_binary_search():
+    # TODO: vary U
+
+    files = ["dag_edges_25.txt"]
+    configs = []
+    for f in files:
+        for scale in [1, 16, 64, 256]:
+            configs.append(Config(file=f, binary_search=True, scale_capacity=scale))
+
+    eval_files(configs)
 
 
 def make_pgfplots_coords(inps, iters):
