@@ -91,6 +91,8 @@ def max_flow_with_guess(
         log()
 
     print_edge_updates()
+    print("Iterations:", i)
+
     log("rounded flow:", np.round(cur_flow[:original_m]))
 
     return round(cur_flow[flow_idx]), np.round(cur_flow[:flow_idx])
