@@ -4,6 +4,7 @@ from min_cost_flow_instance import MinCostFlow
 from feasible_flow import calc_feasible_flow
 import numpy as np
 from utils import count_edge_updates, log, print_edge_updates
+import benchmark
 
 
 def max_flow_with_guess(
@@ -29,6 +30,13 @@ def max_flow_with_guess(
     I.print_B()
     log()
 
+    benchmark.register("instance", {
+        "m": I.m,
+        "n": I.n,
+        "U": I.U,
+        "alpha": I.alpha,
+    })
+
     original_m = I.m
     flow_idx = original_m - 1
     I, cur_flow = calc_feasible_flow(I)
@@ -47,6 +55,12 @@ def max_flow_with_guess(
 
     kappa = 0.9999
     upscale = 500
+
+    benchmark.register("parameters", {
+        "threshold": threshold,
+        "kappa": kappa,
+        "scalefactor": upscale,
+    })
 
     i = 0
     cur_phi = I.phi(cur_flow)
@@ -90,8 +104,8 @@ def max_flow_with_guess(
 
         log()
 
+    benchmark.register("iterations", i)
     print_edge_updates()
-    print("Iterations:", i)
 
     log("rounded flow:", np.round(cur_flow[:original_m]))
 
