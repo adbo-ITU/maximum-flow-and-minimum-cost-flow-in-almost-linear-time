@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Tuple, Optional
 import numpy as np
-import min_ratio as mrlib
 from utils import log
 
 
@@ -20,8 +19,6 @@ class MinCostFlow:
 
     undirected_edge_to_indices: dict[Tuple[int, int], list[int]]
     adj: list[list[int]]
-
-    min_ratio_cycle_finder: Optional[mrlib.MinRatioCycleFinder] = None
 
     def __init__(
         self,
