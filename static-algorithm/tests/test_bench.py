@@ -5,6 +5,7 @@ from tests.verifier import assert_valid_solution
 from tests.test_random import parse_input
 import pytest
 import pathlib
+import os
 from typing import List
 import benchmark
 from dataclasses import dataclass
@@ -23,6 +24,7 @@ class Config:
     file: str
     binary_search: bool = False
     scale_capacity: int = 1
+    correct_answer: int | None = None
 
     def id(self):
         h = hash((self.file, self.binary_search, self.scale_capacity))
@@ -54,7 +56,10 @@ def eval_files(configs: List[Config]):
         benchmark.start_benchmark(config.id())
         config.register_params()
 
-        actual_max_flow = find_max_flow(edges, capacities, s=s, t=t)
+        if config.correct_answer is not None:
+            actual_max_flow = config.correct_answer
+        else:
+            actual_max_flow = find_max_flow(edges, capacities, s=s, t=t)
 
         if config.binary_search:
             mf, flows = max_flow(edges, capacities, s=s, t=t)
@@ -140,3 +145,16 @@ def test_bench_binary_search():
             configs.append(Config(file=f, binary_search=True, scale_capacity=scale))
 
     eval_files(configs)
+
+
+@pytest.mark.parametrize(
+    "file,solution",
+    [
+        ("maxflow/000_2_1_100000.txt", 100000),
+        ("maxflow/001_2_1_0.txt", 0),
+        ("maxflow/002_4_5_3.txt", 3),
+    ],
+)
+@pytest.mark.slow
+def test_bench_maxflow(file: str, solution: int):
+    eval_files([Config(file=file, correct_answer=solution)])
