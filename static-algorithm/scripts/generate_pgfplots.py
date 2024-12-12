@@ -1,4 +1,5 @@
 import sys
+from math import log2
 import json
 
 
@@ -6,10 +7,10 @@ def varying_capacity(benches):
     items = list(benches.values())
     items.sort(key=lambda x: x["bench_config"]["scale_capacity"])
 
-    items = [x for x in items if x["bench_config"]["file"] == "dag_edges_50.txt"]
+    items = [x for x in items if x["bench_config"]["file"] == "dag_edges_25.txt"]
 
     xs = [x["bench_config"]["scale_capacity"] for x in items]
-    ys = [x["iterations"] for x in items]
+    ys = [x["iterations"]/log2(x["max_possible_flow"]) for x in items]
 
     print(make_pgfplots_coords(xs, ys))
 
