@@ -21,18 +21,17 @@
 
             # set this to true to use premade wheels rather than the source
             preferWheels = true;
-            overrides = poetry2nix.defaultPoetryOverrides.extend
-              (self: super: {
-                pyright = super.pyright.overridePythonAttrs
+            overrides = poetry2nix.overrides.withDefaults (final: prev: {
+                pyright = prev.pyright.overridePythonAttrs
                 (
                   old: {
-                    buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools ];
+                    buildInputs = (old.buildInputs or [ ]) ++ [ prev.setuptools ];
                   }
                 );
-                ruff = super.ruff.overridePythonAttrs
+                ruff = prev.ruff.overridePythonAttrs
                 (
                   old: {
-                    buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools ];
+                    buildInputs = (old.buildInputs or [ ]) ++ [ prev.setuptools ];
                   }
                 );
               });

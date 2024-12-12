@@ -87,6 +87,8 @@ def max_flow_with_guess(
         min_ratio, min_ratio_cycle = minimum_cycle_ratio(I, gradients, lengths)
         count_edge_updates(min_ratio_cycle)
 
+        assert min_ratio < 0, "Minimum cycle ratio is not negative"
+
         eta = -(kappa**2) / (50 * gradients.dot(min_ratio_cycle))
         augment_cycle = min_ratio_cycle * (eta * upscale)
 
